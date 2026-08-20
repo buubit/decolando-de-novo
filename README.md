@@ -4,7 +4,7 @@ Tower defense no molde do **Bloons TD 6**, com Pokémon de Kanto segurando a Equ
 
 Quando um capanga é derrotado ele não morre — ele **decola pro céu** virando um brilho, com o *ding* clássico. O "pop" do balão virou o *blasting off again*. É daí que vem o nome.
 
-**[▶ Jogar](https://SEU-USUARIO.github.io/decolando-de-novo/)**
+**[▶ Jogar](https://buubit.github.io/decolando-de-novo/)**
 
 ---
 
