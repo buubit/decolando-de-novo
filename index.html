@@ -1,0 +1,2812 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Decolando de Novo</title>
+<style>
+:root{
+  --fundo:#0c1018; --painel:#151c29; --painel2:#1e2739; --borda:#2c3850;
+  --texto:#e6edf7; --fraco:#8b9ab4; --ouro:#ffcb05; --azul:#3d7dd8; --vermelho:#e8453c;
+  --verde:#4cc76a; --roxo:#a86fd6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(1200px 700px at 50% -10%, #1b2740 0%, transparent 60%),var(--fundo);
+  color:var(--texto);
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100%;padding:14px;overflow:auto;
+}
+#app{width:100%;max-width:1266px;position:relative}
+
+/* ---------- COMUNS ---------- */
+.btn{
+  background:var(--painel2);border:1px solid var(--borda);color:var(--texto);
+  border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer;
+  transition:.12s;font-family:inherit;
+}
+.btn:hover{background:#2a3550;border-color:#41527a}
+.btn.on{background:var(--azul);border-color:#5a9bf0;color:#fff}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn:focus-visible,.card:focus-visible,.up:focus-visible,.esc:focus-visible,.eqc:focus-visible{outline:2px solid var(--ouro);outline-offset:2px}
+.btn.grande{padding:11px 22px;font-size:15px}
+.btn.ouro{background:var(--ouro);border-color:#ffe066;color:#241a00}
+.btn.ouro:hover{background:#ffe066}
+.btn.verde{background:var(--verde);border-color:#6fe08d;color:#06210d}
+.btn.verde:hover{background:#6fe08d}
+.caixa{background:linear-gradient(180deg,var(--painel2),var(--painel));border:1px solid var(--borda);border-radius:10px;padding:10px}
+.tit{font-size:10px;letter-spacing:2.2px;color:var(--fraco);font-weight:800;margin-bottom:8px;text-transform:uppercase}
+.chip{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  border:1px solid;border-radius:5px;padding:1px 5px;vertical-align:middle}
+.chip.faro{background:#3a2a10;color:var(--ouro);border-color:#6b5a20;margin-left:3px}
+.bolas{display:inline-flex;align-items:center;gap:4px;font-family:ui-monospace,monospace;font-weight:800;color:var(--ouro)}
+.bolas img{width:15px;height:15px;image-rendering:pixelated}
+#avisoTela{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;
+  background:rgba(12,16,24,.95);border:1px solid var(--borda);border-radius:9px;
+  padding:10px 20px;font-weight:800;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+
+/* ---------- CABECALHO DE TELA ---------- */
+.cab{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.cab h2{font-size:19px;letter-spacing:.5px}
+.cab .sub{font-size:10px;letter-spacing:2.4px;color:var(--fraco);font-weight:700}
+.cab .dir{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+/* ---------- MENU ---------- */
+#tMenu{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;gap:22px}
+#logo{font-size:clamp(30px,6vw,54px);font-weight:900;letter-spacing:-1px;line-height:.95}
+#logo span{color:var(--ouro)}
+#logoSub{font-size:11px;letter-spacing:5px;color:var(--fraco);font-weight:700;margin-top:6px}
+#menuStats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.mst{background:#0e1520;border:1px solid var(--borda);border-radius:9px;padding:8px 16px;min-width:104px}
+.mst b{display:block;font-size:19px;font-family:ui-monospace,monospace}
+.mst i{font-style:normal;font-size:9.5px;letter-spacing:1.6px;color:var(--fraco);font-weight:700;text-transform:uppercase}
+#menuBtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- ESCOLHA DO INICIAL ---------- */
+#gradeInicial{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.esc{background:linear-gradient(180deg,var(--painel2),var(--painel));border:1px solid var(--borda);
+  border-radius:12px;padding:18px 14px;cursor:pointer;transition:.14s;color:var(--texto);
+  font-family:inherit;text-align:center}
+.esc:hover{border-color:var(--ouro);transform:translateY(-3px)}
+.esc img{width:96px;height:96px;image-rendering:pixelated}
+.esc .n{font-weight:800;font-size:17px;margin:6px 0 5px}
+.esc .d{font-size:11.5px;color:var(--fraco);line-height:1.45;margin-top:8px}
+
+/* ---------- MAPAS ---------- */
+#gradeMapa{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.mapa{background:linear-gradient(180deg,var(--painel2),var(--painel));border:1px solid var(--borda);
+  border-radius:12px;overflow:hidden;cursor:pointer;transition:.14s;position:relative}
+.mapa:hover{border-color:var(--ouro);transform:translateY(-3px)}
+.mapa img{width:100%;display:block;image-rendering:pixelated;border-bottom:1px solid var(--borda)}
+.mapa .corpo{padding:10px 11px 12px}
+.mapa .l{display:flex;align-items:center;gap:8px}
+.mapa .l b{font-size:15px}
+.mapa .d{font-size:11px;color:var(--fraco);line-height:1.4;margin:5px 0 8px;min-height:31px}
+.mapa .l2{font-size:11px;color:var(--fraco);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dif{font-size:9.5px;font-weight:800;letter-spacing:1px;padding:2px 7px;border-radius:5px;text-transform:uppercase;margin-left:auto}
+.dFacil{background:#12331c;color:#6fe08d} .dMedia{background:#33280f;color:#ffcb05} .dDificil{background:#3a1414;color:#ff7d75}
+.mapa .ok{color:var(--verde);font-weight:800} .mapa .novo{color:var(--roxo);font-weight:800}
+.mapa.trancado{opacity:.5;cursor:not-allowed}
+.mapa.trancado:hover{border-color:var(--borda);transform:none}
+.cadeado{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(8,11,18,.72);font-weight:800;font-size:12px;color:var(--fraco);text-align:center;padding:20px}
+
+/* ---------- EQUIPE ---------- */
+#gradeEquipe{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:9px}
+.eqc{background:#0e1520;border:2px solid var(--borda);border-radius:11px;padding:10px 6px;
+  cursor:pointer;transition:.12s;color:var(--texto);font-family:inherit;text-align:center;position:relative}
+.eqc:hover{border-color:#4a5f8c}
+.eqc.dentro{border-color:var(--ouro);background:#1c1a10}
+.eqc img{width:58px;height:58px;image-rendering:pixelated}
+.eqc .n{font-weight:800;font-size:12px;margin:3px 0 4px}
+.eqc .cst{font-family:ui-monospace,monospace;font-size:11px;color:var(--ouro);font-weight:800;margin-top:5px}
+.eqc .faro{font-size:8.5px;font-weight:800;color:var(--ouro);letter-spacing:1px;margin-top:3px}
+#eqAviso{background:#3a1414;border:1px solid #6b2a2a;color:#ff9a92;border-radius:9px;
+  padding:9px 12px;font-size:12px;font-weight:700;margin:12px 0;line-height:1.45}
+
+/* ---------- TREINO / ARVORE / CASSINO ---------- */
+.ajuda{color:var(--fraco);font-size:12.5px;line-height:1.6;margin-bottom:14px;max-width:760px}
+.linha{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+#gradeTreino{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px}
+.eqc.shiny{border-color:var(--ouro);box-shadow:0 0 0 1px var(--ouro) inset}
+.eqc .xpn{font-family:ui-monospace,monospace;font-size:11px;color:var(--ouro);font-weight:800;margin-top:5px}
+.eqc .non{font-size:10px;color:var(--fraco);margin-top:2px}
+.eqc .tmn{font-size:9.5px;color:var(--roxo);font-weight:800;margin-top:3px}
+.arimg{width:64px;height:64px;image-rendering:pixelated}
+.chip.sh{background:#3a2a10;color:var(--ouro);border-color:#8a7020;margin-left:4px}
+.and{display:flex;gap:9px;align-items:stretch;margin-bottom:9px;flex-wrap:wrap}
+.andn{width:26px;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:ui-monospace,monospace;font-weight:800;font-size:15px;color:#41527a;
+  border-right:2px solid var(--borda)}
+.no{flex:1 1 210px;background:#0e1520;border:1px solid var(--borda);border-radius:10px;padding:9px 11px;transition:.12s}
+.no.pode{cursor:pointer;border-color:#4a5f8c}
+.no.pode:hover{border-color:var(--ouro);transform:translateY(-2px)}
+.no.meu{border-color:#2a4a32;background:#0d1a11}
+.no.trav{opacity:.42}
+.no .nn{font-weight:800;font-size:12.5px}
+.no .nd{font-size:10.5px;color:var(--fraco);line-height:1.4;margin:3px 0 5px;min-height:29px}
+.no .nc{font-family:ui-monospace,monospace;font-size:11px;font-weight:800;color:var(--ouro)}
+.no .ok{color:var(--verde)} .no .x{color:#7d8aa3;font-family:inherit;font-weight:700}
+.tmc{background:#0e1520;border:1px solid var(--borda);border-radius:10px;padding:9px 11px;margin-bottom:7px;cursor:pointer;transition:.12s}
+.tmc:hover{border-color:#4a5f8c}
+.tmc.eq{border-color:var(--ouro);background:#1c1a10}
+.tmc.inc{opacity:.4;cursor:not-allowed}
+.tmc.destaque{border-color:var(--roxo);background:#160f1f;cursor:default}
+.tmc .l{display:flex;align-items:center;gap:7px;font-size:13px}
+.tmc .q{margin-left:auto;font-family:ui-monospace,monospace;font-size:11px;color:var(--fraco)}
+.tmc .d{font-size:10.5px;color:var(--fraco);line-height:1.4;margin-top:4px}
+.tmc .q2{font-size:10px;color:#5f6d87;margin-top:4px}
+.vazio{color:#5f6d87;font-size:11.5px}
+.stat img{width:14px;height:14px;image-rendering:pixelated}
+#csBanner{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:9px}
+
+/* ---------- SAFARI ---------- */
+#gradeSafari{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:10px}
+.sfc{background:#0e1520;border:2px solid var(--borda);border-radius:11px;padding:12px 8px;
+  text-align:center;cursor:pointer;transition:.12s}
+.sfc:hover{border-color:#4a5f8c}
+.sfc.alvo{border-color:var(--ouro);background:#1c1a10}
+.sfc.tem{cursor:default;border-color:#2a4a32;background:#0d1a11}
+.sfc img{width:64px;height:64px;image-rendering:pixelated}
+.sfc img.silhueta{filter:brightness(0) opacity(.42)}
+.sfc .n{font-weight:800;font-size:12.5px;margin:4px 0 2px}
+.sfc .rar{font-size:9.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+.sfc .capt{font-size:10.5px;color:var(--verde);font-weight:800;margin-top:7px}
+.pity{height:5px;background:#1c2536;border-radius:3px;overflow:hidden;margin:8px 4px 4px}
+.pity i{display:block;height:100%;background:linear-gradient(90deg,var(--azul),var(--ouro))}
+.sfc .pt{font-size:9.5px;color:var(--fraco);font-family:ui-monospace,monospace}
+@keyframes tremida{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.sfc.tremer{animation:tremida .42s}
+#sfPainel{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+#sfNome{font-weight:800;font-size:14px}
+#sfDica{font-size:11px;color:var(--fraco);line-height:1.5;margin-top:12px;max-width:640px}
+
+/* ---------- HUD DA PARTIDA ---------- */
+#hud{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:linear-gradient(180deg,var(--painel2),var(--painel));
+  border:1px solid var(--borda);border-radius:12px 12px 4px 4px;padding:9px 12px;margin-bottom:8px}
+#marca{font-weight:800;letter-spacing:.5px;font-size:15px;line-height:1.05}
+#marca small{display:block;font-weight:600;font-size:9.5px;letter-spacing:2.4px;color:var(--fraco)}
+.stat{display:flex;align-items:center;gap:6px;background:#0e1520;border:1px solid var(--borda);
+  border-radius:8px;padding:5px 10px;font-family:ui-monospace,"Consolas",monospace;font-size:14px;font-weight:700}
+.stat i{font-style:normal;font-size:13px;opacity:.9}
+.stat img{width:14px;height:14px;image-rendering:pixelated}
+.stat.ouro{color:var(--ouro)} .stat.vermelho{color:#ff7d75} .stat.azul{color:#7fb4ff}
+#espaco{flex:1}
+
+/* ---------- LAYOUT DA PARTIDA ---------- */
+#corpo{display:flex;gap:8px;align-items:flex-start}
+#palco{position:relative;flex:1;min-width:0;border:1px solid var(--borda);border-radius:4px 4px 12px 12px;overflow:hidden;background:#0a0e14}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated;cursor:crosshair;touch-action:manipulation}
+#lado{width:272px;flex:none;display:flex;flex-direction:column;gap:8px}
+.card{display:flex;gap:9px;align-items:center;background:#0e1520;border:1px solid var(--borda);
+  border-radius:9px;padding:7px 8px;margin-bottom:6px;cursor:pointer;transition:.12s}
+.card:hover{border-color:#4a5f8c;transform:translateX(2px)}
+.card.sel{border-color:var(--ouro);background:#1c1a10}
+.card.pobre{opacity:.42;cursor:not-allowed;transform:none}
+.card img{width:38px;height:38px;image-rendering:pixelated;flex:none}
+.card .n{font-weight:800;font-size:13px}
+.card .tec{font-size:9px;color:var(--fraco);border:1px solid var(--borda);border-radius:4px;padding:0 4px}
+.card .d{font-size:10.5px;color:var(--fraco);line-height:1.3;margin-top:1px}
+.card .c{margin-left:auto;font-family:ui-monospace,monospace;font-weight:800;color:var(--ouro);font-size:13px;flex:none}
+.up{background:#0e1520;border:1px solid var(--borda);border-radius:9px;padding:8px;margin-bottom:6px;cursor:pointer;transition:.12s}
+.up:hover{border-color:#4a5f8c}
+.up.feito{opacity:.5;cursor:default;border-color:#2a4a32;background:#0d1a11}
+.up.pobre{opacity:.4;cursor:not-allowed}
+.up .l{display:flex;align-items:center;gap:6px}
+.up .l img{width:26px;height:26px;image-rendering:pixelated}
+.up .n{font-weight:800;font-size:12.5px}
+.up .c{margin-left:auto;font-family:ui-monospace,monospace;font-weight:800;color:var(--ouro);font-size:12px}
+.up .d{font-size:10.5px;color:var(--fraco);line-height:1.35;margin-top:3px}
+.up.evo .n{color:var(--roxo)}
+.up.ramo{border-color:#3a2a52}
+.up.bloq{opacity:.45;cursor:not-allowed;border-color:#5a2a2a;background:#180d0d}
+.up.bloq:hover{border-color:#5a2a2a}
+.up.bloq .n{color:#ff9a92}
+.stat.teste{background:#3a1414;border-color:#6b2a2a;color:#ff9a92;font-size:11px;letter-spacing:1.4px}
+#lAuto{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11.5px;color:var(--fraco);
+  font-weight:700;cursor:pointer;user-select:none}
+#lAuto input{accent-color:var(--verde);width:14px;height:14px;cursor:pointer}
+#testeInfo{display:none;max-width:520px;font-size:11px;color:#ff9a92;line-height:1.6;
+  background:#2a1212;border:1px solid #5a2a2a;border-radius:9px;padding:9px 14px}
+#testeInfo.ver{display:block}
+.mira{display:flex;gap:4px;margin-top:2px}
+.mira .btn{flex:1;padding:5px 0;font-size:10.5px}
+#vender{width:100%;background:#3a1a1a;border-color:#6b2a2a;color:#ff9a92;margin-top:6px}
+#vender:hover{background:#4d2020}
+#prev{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+#prev .p{display:flex;align-items:center;gap:3px;background:#0e1520;border:1px solid var(--borda);border-radius:6px;padding:2px 5px}
+#prev .p.camu{border-color:var(--roxo);background:#1a1226}
+#prev .p img{width:20px;height:20px;image-rendering:pixelated}
+#prev .p b{font-family:ui-monospace,monospace;font-size:11px;color:var(--fraco)}
+#tela{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(6,9,14,.9);backdrop-filter:blur(3px);text-align:center;padding:24px}
+#tela.ver{display:flex}
+#tela .in{max-width:480px}
+#tela h1{font-size:30px;letter-spacing:1px;margin-bottom:10px}
+#tela p{color:var(--fraco);font-size:14px;line-height:1.7;margin-bottom:18px}
+#aviso{position:absolute;left:50%;top:38px;transform:translateX(-50%);
+  background:rgba(10,14,22,.9);border:1px solid var(--borda);border-radius:8px;
+  padding:8px 16px;font-weight:800;font-size:14px;letter-spacing:.4px;
+  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#dica{font-size:10.5px;color:#5f6d87;line-height:1.5;text-align:center;margin-top:2px}
+
+/* ---------- TELA ESTREITA ---------- */
+@media (max-width:920px){
+  body{padding:6px;align-items:flex-start}
+  #corpo{flex-direction:column}
+  #lado{width:100%;flex-direction:row;flex-wrap:wrap}
+  #lado .caixa{flex:1 1 260px}
+  #marca{font-size:13px;width:100%;margin-bottom:2px}
+  #espaco{display:none}
+  #hud{gap:6px}
+  .stat{font-size:12px;padding:4px 8px}
+  #dica{display:none}
+}
+@media (max-width:520px){
+  .card .d{display:none}
+  #lado .caixa{flex:1 1 100%}
+  .esc img{width:72px;height:72px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ============ MENU ============ -->
+<section id="tMenu">
+  <div>
+    <div id="logo">DECOLANDO<br><span>DE NOVO</span></div>
+    <div id="logoSub">KANTO · EQUIPE ROCKET</div>
+  </div>
+  <div id="menuStats">
+    <div class="mst"><b id="mBolas">0</b><i>Pokebolas</i></div>
+    <div class="mst"><b id="mColecao">0/9</b><i>Colecao</i></div>
+    <div class="mst"><b id="mMapas">0/3</b><i>Mapas limpos</i></div>
+    <div class="mst"><b id="mPo">0</b><i>Po de estrela</i></div>
+    <div class="mst"><b id="mFichas">0</b><i>Fichas</i></div>
+  </div>
+  <div id="menuBtns">
+    <button class="btn grande verde" id="mJogar">▶ Jogar</button>
+    <button class="btn grande ouro" id="mSafari">◓ Safari</button>
+    <button class="btn grande" id="mTreino">✦ Treino</button>
+    <button class="btn grande" id="mCassino">☆ Cassino</button>
+    <button class="btn" id="mTeste">Modo teste: OFF</button>
+    <button class="btn" id="mReset">Apagar progresso</button>
+  </div>
+  <div id="testeInfo">Modo teste: dinheiro infinito, todos os Pokemon, todos os mapas, sem limite de unidades.<br>
+    Nada e salvo — nem pokebolas, nem mapas limpos. O limite de "so um por forma final" continua valendo.</div>
+</section>
+
+<!-- ============ ESCOLHA DO INICIAL ============ -->
+<section id="tInicial" style="display:none">
+  <div class="cab"><div><h2>Escolha seu parceiro</h2><div class="sub">PROFESSOR CARVALHO</div></div></div>
+  <p style="color:var(--fraco);font-size:13px;line-height:1.6;margin-bottom:14px;max-width:660px">
+    Um so. Os outros dois voce vai ter que capturar no Safari depois — como todo mundo.</p>
+  <div id="gradeInicial"></div>
+</section>
+
+<!-- ============ MAPAS ============ -->
+<section id="tMapa" style="display:none">
+  <div class="cab">
+    <div><h2>Para onde?</h2><div class="sub">SELECAO DE ROTA</div></div>
+    <div class="dir"><button class="btn" id="mapVoltar">← Menu</button></div>
+  </div>
+  <div id="gradeMapa"></div>
+</section>
+
+<!-- ============ EQUIPE ============ -->
+<section id="tEquipe" style="display:none">
+  <div class="cab">
+    <div><h2>Monte seu time</h2><div class="sub">DESTINO: <span id="eqMapa">—</span></div></div>
+    <div class="dir">
+      <span class="stat">Time <b id="eqConta">0/6</b></span>
+      <button class="btn" id="eqVoltar">← Mapas</button>
+      <button class="btn grande verde" id="eqIr">Comecar ▶</button>
+    </div>
+  </div>
+  <p style="color:var(--fraco);font-size:12.5px;line-height:1.6;margin-bottom:12px;max-width:720px">
+    So os escolhidos aparecem na loja durante a partida. Olhe os tipos: <b>Terra e imune a Eletrico</b>,
+    <b>Fantasma e imune a Normal</b>, <b>Sombrio e imune a Psiquico</b>.</p>
+  <div id="eqAviso" style="display:none">
+    ⚠ Este mapa tem inimigos <b>camuflados</b> e nenhum do seu time enxerga camuflado.
+    Sem um Growlithe (ou Kadabra/Dragonite depois), eles passam direto.</div>
+  <div id="gradeEquipe"></div>
+</section>
+
+<!-- ============ SAFARI ============ -->
+<section id="tSafari" style="display:none">
+  <div class="cab">
+    <div><h2>Safari</h2><div class="sub">1 POKEBOLA = 1 TIRO</div></div>
+    <div class="dir"><span class="stat ouro" id="sfBolas">0</span><button class="btn" id="sfVoltar">← Menu</button></div>
+  </div>
+  <div id="gradeSafari"></div>
+  <div id="sfPainel" style="display:none">
+    <span id="sfNome">—</span>
+    <button class="btn grande ouro" id="sf1">◓ Atirar 1</button>
+    <button class="btn grande" id="sf10">◓ Atirar 10</button>
+  </div>
+  <div id="sfDica">Escolha quem voce quer e jogue bolas nele. A chance sobe conforme voce insiste —
+    e no tiro 100 a captura e garantida. Nenhum tiro e desperdicado: o contador fica salvo.</div>
+</section>
+
+<!-- ============ TREINO ============ -->
+<section id="tTreino" style="display:none">
+  <div class="cab">
+    <div><h2>Treino</h2><div class="sub">ARVORE DE HABILIDADES</div></div>
+    <div class="dir"><span class="stat ouro" id="trPo">0</span><button class="btn" id="trVoltar">← Menu</button></div>
+  </div>
+  <p class="ajuda">Cada Pokemon acumula o proprio XP jogando — e esse XP so serve na arvore dele.
+    Os bonus da arvore valem em toda partida, pra sempre.</p>
+  <div id="gradeTreino"></div>
+</section>
+
+<!-- ============ ARVORE DE UM POKEMON ============ -->
+<section id="tArvore" style="display:none">
+  <div class="cab">
+    <img id="arImg" class="arimg" alt="">
+    <div><h2 id="arNome">—</h2><div class="sub"><span id="arXp">0 XP</span> DISPONIVEL</div></div>
+    <div class="dir"><button class="btn" id="arVoltar">← Treino</button></div>
+  </div>
+  <div id="arGrade"></div>
+  <div class="caixa" id="arShiny" style="display:none">
+    <div class="tit">Idolo · Po de Estrela</div>
+    <p class="ajuda" id="arShinyEstado"></p>
+    <div class="linha"><span class="stat ouro" id="arPo">0</span>
+      <button class="btn ouro" id="sh1">✦ Atirar 1</button>
+      <button class="btn" id="sh25">✦ Atirar 25</button></div>
+  </div>
+  <div class="caixa" id="arTM" style="display:none">
+    <div class="tit">Slot de TM · clique pra equipar</div>
+    <div id="arTMLista"></div>
+  </div>
+</section>
+
+<!-- ============ CASSINO ============ -->
+<section id="tCassino" style="display:none">
+  <div class="cab">
+    <div><h2>Game Corner</h2><div class="sub">CELADON · BANNER DA SEMANA</div></div>
+    <div class="dir"><span class="stat ouro" id="csFichas">0</span><span class="stat ouro" id="csPo">0</span>
+      <button class="btn" id="csVoltar">← Menu</button></div>
+  </div>
+  <p class="ajuda">1 ficha = 1 tiro. 60% sai TM, 40% sai Po de Estrela. As tres em destaque tem 3x mais chance.
+    O banner troca em <b id="csDias">7</b> dia(s) — mas as fichas nunca expiram, entao da pra guardar.</p>
+  <div id="csBanner"></div>
+  <div class="linha" style="margin:14px 0">
+    <button class="btn grande ouro" id="cs1">☆ Atirar 1</button>
+    <button class="btn grande" id="cs10">☆ Atirar 10</button>
+  </div>
+  <div class="tit" style="margin-top:16px">Suas TMs</div>
+  <div id="csInv"></div>
+</section>
+
+<!-- ============ PARTIDA ============ -->
+<section id="tJogo" style="display:none">
+  <div id="hud">
+    <div id="marca">DECOLANDO DE NOVO<small id="jMapa">ROTA 1</small></div>
+    <div class="stat ouro"><i>◉</i><span id="hDin">0</span></div>
+    <div class="stat vermelho"><i>✖</i><span id="hVid">0</span></div>
+    <div class="stat azul"><i>▚</i><span id="hRod">0</span>/<span id="hTot">10</span></div>
+    <div class="stat"><i>✦</i><span id="hPop">0</span></div>
+    <div class="stat ouro"><img src="" id="hBolImg"><span id="hBol">0</span></div>
+    <div class="stat" id="hUnidBox"><i>⬢</i><span id="hUnid">0</span>/<span id="hUnidMax">10</span></div>
+    <div class="stat teste" id="hTeste" style="display:none">MODO TESTE</div>
+    <div id="espaco"></div>
+    <button class="btn" id="bVel">▸ 1x</button>
+    <button class="btn" id="bPause">‖ Pausa</button>
+    <button class="btn" id="bSom">♪</button>
+    <button class="btn" id="bSair">Sair</button>
+  </div>
+  <div id="corpo">
+    <div id="palco">
+      <canvas id="cv" width="960" height="600"></canvas>
+      <div id="aviso"></div>
+      <div id="tela"><div class="in">
+        <h1 id="tTit"></h1><p id="tTxt"></p>
+        <button class="btn grande ouro" id="tBtn">Voltar ao menu</button>
+      </div></div>
+    </div>
+    <div id="lado">
+      <div class="caixa">
+        <div class="tit">Proxima onda</div>
+        <div id="prev"></div>
+        <button class="btn verde" id="bOnda" style="width:100%;margin-top:9px;padding:9px;font-size:14px">▶ Iniciar Rodada 1</button>
+        <label id="lAuto"><input type="checkbox" id="cAuto"> Rodada automatica</label>
+      </div>
+      <div class="caixa" id="cxLoja">
+        <div class="tit">Equipe</div>
+        <div id="loja"></div>
+        <div id="dica">Clique num Pokemon e depois no terreno.<br>Teclas: 1-6 comprar · Espaco rodada · Esc cancelar</div>
+      </div>
+      <div class="caixa" id="cxTorre" style="display:none">
+        <div class="tit" id="tnome">—</div>
+        <div id="ups"></div>
+        <div class="tit" style="margin:8px 0 4px">Mira</div>
+        <div class="mira" id="mira"></div>
+        <button class="btn" id="vender">Liberar (+0)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="avisoTela"></div>
+</div>
+
+<script>
+/* ============================================================
+   DECOLANDO DE NOVO - Fase 2
+   Arquivo unico, sem dependencias. Canvas 2D + pixel art embutida.
+   Progresso salvo em localStorage.
+   ============================================================ */
+
+/* ---------- 1. UTIL ---------- */
+const CV=document.getElementById('cv'), G=CV.getContext('2d');
+G.imageSmoothingEnabled=false;
+const LARG=960, ALT=600;
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const dist=(ax,ay,bx,by)=>Math.hypot(ax-bx,ay-by);
+/* ---------- 2. PIXEL ART ----------
+   Cada sprite: paleta de caracteres + linhas. '.' = transparente.
+   Renderizado uma vez num canvas offscreen, ja no tamanho final.   */
+function montar(p,r,s){
+  const w=Math.max(...r.map(l=>l.length)), h=r.length;
+  const c=document.createElement('canvas'); c.width=w*s; c.height=h*s;
+  const g=c.getContext('2d');
+  for(let y=0;y<h;y++){const li=r[y];
+    for(let x=0;x<li.length;x++){const cor=p[li[x]]; if(!cor)continue;
+      g.fillStyle=cor; g.fillRect(x*s,y*s,s,s);}}
+  return c;
+}
+const P_FOGO ={'1':'#7a3210','2':'#ef7f3c','3':'#ffb06b','4':'#fbe3bb','5':'#2b1d16','7':'#ffe066','8':'#ff7a18'};
+const P_FOGO2={'1':'#6e2412','2':'#dd5533','3':'#f4805c','4':'#fbe3bb','5':'#2b1d16','7':'#ffe066','8':'#ff7a18'};
+const P_GRAMA={'1':'#1d4a3e','2':'#6cc4a6','3':'#9ee2c6','4':'#3e8b78','5':'#2b1d16','7':'#5cc44a','8':'#2f7a2b','9':'#e86fa8','a':'#bf4a86'};
+const P_ELET ={'1':'#6b4a12','2':'#f5d340','3':'#ffe98a','4':'#2b2318','5':'#2b1d16','6':'#ffffff','7':'#e8453c','8':'#a3702a'};
+const P_ELET2={'1':'#6b3a12','2':'#e08a30','3':'#f7b25e','4':'#4a3320','5':'#2b1d16','6':'#ffffff','7':'#ffd93d','8':'#a3702a'};
+
+const ARTE={
+charmander:{s:3,p:P_FOGO,r:[
+'................',
+'.....11111......',
+'....1222221.....',
+'...122333221.8..',
+'...123333321.87.',
+'...125333521.878',
+'...123333321.878',
+'...122311221..87',
+'....123332111.8.',
+'...1124421.121..',
+'..12244442.121..',
+'..124444442.11..',
+'..124444444211..',
+'..1124444421....',
+'....11222211....',
+'................']},
+charmeleon:{s:3,p:P_FOGO2,r:[
+'................',
+'....11111...11..',
+'...1222221.111..',
+'..122333221111..',
+'..1233333321.87.',
+'..1253335321.878',
+'..1233333321.878',
+'..1223113221..87',
+'...1233332111...',
+'..112444421.121.',
+'.122444444.1121.',
+'.1244444444.111.',
+'.12444444442111.',
+'.11244444442....',
+'...112222211....',
+'....11....11....']},
+bulbasaur:{s:3,p:P_GRAMA,r:[
+'................',
+'......8888......',
+'.....877778.....',
+'....87777778....',
+'...1877777881...',
+'..122188882221..',
+'.12233222332221.',
+'.12523222325221.',
+'.12233222332221.',
+'.12232111232221.',
+'.12233333322221.',
+'.11244444442211.',
+'..112222222211..',
+'...11.1111.11...',
+'................',
+'................']},
+ivysaur:{s:3,p:P_GRAMA,r:[
+'................',
+'.....a999a......',
+'....99a99a99....',
+'...a9999999a....',
+'....897778a9....',
+'...18777777881..',
+'..1221888822211.',
+'.12233222332221.',
+'.12523222325221.',
+'.12233222332221.',
+'.12232111232221.',
+'.12233333322221.',
+'.11244444442211.',
+'..112222222211..',
+'...11.1111.11...',
+'................']},
+pikachu:{s:3,p:P_ELET,r:[
+'..4.........4...',
+'..44.......44...',
+'..14.......41...',
+'..124.....421...',
+'..1221...1221...',
+'...122111221....',
+'..122333332211..11',
+'..125333335221.122',
+'..172333333271.12.',
+'..122331132221122.',
+'...12333333211122.',
+'..11222222221118..',
+'.122222222222118..',
+'.11222222222211...',
+'..111222221111....',
+'..................']},
+raichu:{s:3,p:P_ELET2,r:[
+'...4......4.....',
+'..141....141....',
+'..121....121....',
+'..1221..1221....',
+'...1221.1221....',
+'...122333221....',
+'..1233333332....',
+'..1253333352.1..',
+'..1273333372.11.',
+'..1233111332.1..',
+'...123333321....',
+'..11222222211...',
+'.1222222222211..',
+'.112222222211.7.',
+'..11122221111.77',
+'.............77.']},
+
+rattata:{s:2,p:{'1':'#4a2f5c','2':'#a06fc4','3':'#c99adf','4':'#f0d9a8','5':'#2b1d16','6':'#ffffff'},r:[
+'................',
+'..11.......11...',
+'.1221.....1221..',
+'.12321...12321..',
+'..122333332211..',
+'.12233333333221.',
+'.12533333335221.',
+'.12334444443221.',
+'.11234444432111.',
+'..1123333321.11.',
+'...11222221...1.',
+'....111111......']},
+zubat:{s:2,p:{'1':'#26265e','2':'#6a6ad0','3':'#9a9ae8','4':'#a8559a','5':'#ffffff','6':'#3a1030'},r:[
+'.11..........11.',
+'1441........1441',
+'144411....114441',
+'1444411111144441',
+'1444412332144441',
+'.144412333214441',
+'..1441666321441.',
+'...1415555141 1.',
+'....112332211...',
+'......1111......']},
+ekans:{s:2,p:{'1':'#4a2a1a','2':'#8f4bd4','3':'#b57ae8','4':'#f0d9a8','5':'#2b1d16','6':'#e8453c'},r:[
+'................',
+'.....11111......',
+'....1233321.....',
+'...123333321....',
+'...125333521....',
+'...123333321....',
+'....1236321.....',
+'.....11311......',
+'...111233111....',
+'..12233333221...',
+'.1223311122211..',
+'.1221....112211.',
+'.111........111.']},
+koffing:{s:2,p:{'1':'#2a2a3e','2':'#7a5fb0','3':'#a98fd6','4':'#5a4a7e','5':'#2b1d16','6':'#f5f5f5','7':'#c0c0d8'},r:[
+'.....11111......',
+'...117343711....',
+'..17334333371...',
+'.1733333334331..',
+'.1335333353331..',
+'.1343333333431..',
+'.1333455543331..',
+'.1733433333371..',
+'..17333343371...',
+'...117333711....',
+'.....11111......']},
+grunt:{s:2,p:{'1':'#141420','2':'#2b2b3e','3':'#4a4a68','4':'#f0c8a0','5':'#2b1d16','6':'#e8453c','7':'#ffffff'},r:[
+'................',
+'.....11111......',
+'....1333331.....',
+'...133333331....',
+'...144444441....',
+'...145444541....',
+'...144444441....',
+'....14444441....',
+'...111111111....',
+'..172222222 1...',
+'.11722662227 1..',
+'.11222662221 1..',
+'.11222222221 1..',
+'..1122222211....',
+'...11...111.....',
+'...11....11.....']},
+elite:{s:2,p:{'1':'#101018','2':'#3a1a1a','3':'#6b2a2a','4':'#f0c8a0','5':'#2b1d16','6':'#e8453c','7':'#ffcb05','8':'#8a8aa0'},r:[
+'................',
+'....1111111.....',
+'...133333331....',
+'..13333333331...',
+'..14444444441...',
+'..14544444541...',
+'..14444444441...',
+'...144444441....',
+'..1188888811....',
+'.1782222222871..',
+'.1782266622871..',
+'.1182266622811..',
+'.1122266622111..',
+'..11222222211...',
+'..11222.12211...',
+'..1111...1111...']},
+balao:{s:2,p:{'1':'#3a2a10','2':'#f2d97a','3':'#fff0b8','4':'#2b1d16','5':'#e8453c','6':'#ffffff','7':'#c9a86a','8':'#8a5a2a','9':'#d8a828'},r:[
+'...11.....11....',
+'..1221...1221...',
+'..12221.12221...',
+'.1122211122211..',
+'.1233222222221..',
+'1332229992222221',
+'1322299999222221',
+'1322222222222221',
+'1322442222442221',
+'1322442222442221',
+'1322222552222221',
+'1342222222224221',
+'1132222222222211',
+'.11322222222211.',
+'..112222222211..',
+'...1122222211...',
+'.....111111.....',
+'......1881......',
+'.....187781.....',
+'....18777781....',
+'....18777781....',
+'.....117811.....']},
+
+arvore:{s:3,p:{'1':'#173a2a','2':'#2f7a4a','3':'#48a862','4':'#5c3a1e','5':'#3a2412'},r:[
+'.....111........',
+'...1133311......',
+'..113333311.....',
+'.11333333311....',
+'1133333333311...',
+'1333333333331...',
+'1333233333331...',
+'1332233333331...',
+'.113333333311...',
+'..1133333311....',
+'....114411......',
+'.....1451.......',
+'.....1451.......',
+'....11451.......',
+'...1145511......']},
+pedra:{s:3,p:{'1':'#3a3f4a','2':'#6b7280','3':'#8b93a3'},r:[
+'...1111...',
+'..133321..',
+'.13333321.',
+'1332222321',
+'1322222231',
+'1122222211',
+'.11111111.']},
+centro:{s:3,p:{'1':'#5a1a1a','2':'#e8453c','3':'#ff8a80','4':'#f2f2f5','5':'#c8ccd6','6':'#2a3550','7':'#7fb4ff','8':'#ffffff'},r:[
+'.....111111.....',
+'....13222231....',
+'...1322222231...',
+'..132222222231..',
+'.13222282222231.',
+'.13222888222231.',
+'.13222282222231.',
+'.13222222222231.',
+'.11111111111111.',
+'.14444444444451.',
+'.14477444774451.',
+'.14477444774451.',
+'.14444444444451.',
+'.14444466444451.',
+'.14455566544551.',
+'.15555566555551.',
+'.11111111111111.']}
+};
+
+/* ---------- 2b. PIXEL ART DA FASE 2 ----------
+   Alguns sprites reaproveitam as linhas de outro com paleta trocada
+   (ARTE.grunt.r etc) - e o truque que deixa variantes praticamente de graca. */
+const P_AGUA ={'1':'#1a4a6b','2':'#6bc0e8','3':'#a8e0f5','4':'#c08040','5':'#2b1d16','6':'#ffffff','7':'#8a5528','8':'#f5e0b0'};
+const P_LUTA ={'1':'#2a3a4a','2':'#7ba8a8','3':'#a5cccc','4':'#4a2a1a','5':'#2b1d16','6':'#ffffff','7':'#6b4a2a','8':'#c04040'};
+const P_CAO  ={'1':'#6b3410','2':'#f08838','3':'#ffb060','4':'#f8e8c8','5':'#2b1d16','6':'#ffffff','7':'#3a2008'};
+const P_PSI  ={'1':'#6b4a12','2':'#e8c060','3':'#f5dc98','4':'#7a4a2a','5':'#2b1d16','6':'#ffffff','7':'#b0b8c8'};
+const P_EEVEE={'1':'#6b4a2a','2':'#c08850','3':'#e0b078','4':'#f5e8d0','5':'#2b1d16','6':'#ffffff'};
+const P_VAPOR={'1':'#1c4a6e','2':'#5aa8d8','3':'#8fd0ec','4':'#dff2fa','5':'#2b1d16','6':'#ffffff'};
+const P_JOLT ={'1':'#7a6410','2':'#f0d040','3':'#ffe888','4':'#f8f0d0','5':'#2b1d16','6':'#ffffff'};
+const P_FLARE={'1':'#7a2810','2':'#e85a30','3':'#ff8a58','4':'#ffe8a8','5':'#2b1d16','6':'#ffffff'};
+const P_DRAG ={'1':'#25457e','2':'#6b9ce8','3':'#a0c4f5','4':'#f2f6fb','5':'#2b1d16','6':'#ffffff','7':'#e8d060'};
+const P_DRGN ={'1':'#8a5a10','2':'#f0c060','3':'#ffdc98','4':'#f5eed8','5':'#2b1d16','6':'#ffffff','7':'#5ac47a'};
+
+const ARTE2={
+squirtle:{s:3,p:P_AGUA,r:[
+'................',
+'.....11111......',
+'....1222221.....',
+'...122333221....',
+'...123333321....',
+'...125333521....',
+'...123333321....',
+'...122311221....',
+'..1112333211....',
+'.117444444711...',
+'.174788874471...',
+'.174788874471...',
+'.117444444711...',
+'..1122222211....',
+'...11....11.....',
+'................']},
+wartortle:{s:3,p:P_AGUA,r:[
+'..1.............',
+'.121...11111....',
+'.1221.1222221...',
+'..1221122333221.',
+'...122123333321.',
+'....12125333521.',
+'.....1123333321.',
+'......122311221.',
+'.....1112333211.',
+'....117444444711',
+'....174788874471',
+'....174788874471',
+'....117444444711',
+'.....1122222211.',
+'......11....11..',
+'................']},
+machop:{s:3,p:P_LUTA,r:[
+'................',
+'....1777771.....',
+'...123333321....',
+'..1233333332 1..',
+'..1253333532 1..',
+'..1233333332 1..',
+'..1123333321 1..',
+'.1111233332111 .',
+'.12211233321122.',
+'.12211222221122.',
+'.11112222221111.',
+'...11222222 11..',
+'...1122222211...',
+'...112...211....',
+'...111...111....',
+'................']},
+machoke:{s:3,p:P_LUTA,r:[
+'................',
+'...17777771.....',
+'..12333333321...',
+'.1233333333321..',
+'.1253333335321..',
+'.1233333333321..',
+'.1123333333211..',
+'11112333332111 1',
+'12211233332112 1',
+'12211888888112 1',
+'11112222221111.1',
+'..112222222211..',
+'..112222222211..',
+'..1121....1211..',
+'..1111....1111..',
+'................']},
+growlithe:{s:3,p:P_CAO,r:[
+'................',
+'...1441..1441...',
+'..144441144441..',
+'..1444444444 1..',
+'.1422222222241..',
+'.1425222225241..',
+'.1422222222241..',
+'.1422711722241..',
+'.1442222222441..',
+'..14444444441...',
+'..114222222411..',
+'...1422222241...',
+'...1442222441...',
+'....11444411....',
+'.....111111.....',
+'................']},
+arcanine:{s:3,p:P_CAO,r:[
+'..44.........44.',
+'.1441.......1441',
+'.14441.....14441',
+'..14444444444441',
+'.144444444444441',
+'.14222222222441.',
+'.14252222252441.',
+'.14222222222441.',
+'.14227117224441.',
+'.144222222244441',
+'.1444444444444 1',
+'..1442222244441.',
+'...1422222244 1.',
+'...1442222441...',
+'....11444411....',
+'.....111111.....']},
+abra:{s:3,p:P_PSI,r:[
+'................',
+'....11....11....',
+'...1221..1221...',
+'...12211112211..',
+'..12233333332 1.',
+'..123333333321..',
+'..125533355321..',
+'..123333333321..',
+'..112333333211..',
+'..441122221144..',
+'.14442222244441.',
+'.14442222244441.',
+'..114222222411..',
+'...1122222211...',
+'....11111111....',
+'................']},
+kadabra:{s:3,p:P_PSI,r:[
+'...11....11.....',
+'..1221..1221....',
+'..12211112211...',
+'.12233333332 1..',
+'.123333333321...',
+'.125533355321.7.',
+'.123333333321.7.',
+'.114444444411.7.',
+'.1444444444417..',
+'..14422224441...',
+'..14422224441...',
+'...144222441....',
+'...1442224411...',
+'....11222211....',
+'.....111111.....',
+'................']},
+eevee:{s:3,p:P_EEVEE,r:[
+'..11.......11.....',
+'.1221.....1221....',
+'.12321...12321....',
+'.123321.123321....',
+'..123311133321....',
+'..123333333321....',
+'..125333335321....',
+'..123331133321....',
+'..112333333211.44.',
+'...1444444441.444.',
+'..14444444444.444.',
+'..14444444444.444.',
+'...1144444411.44..',
+'....11111111......',
+'..................',
+'..................']},
+vaporeon:{s:3,p:P_VAPOR,r:[
+'...3.......3......',
+'..131.....131.....',
+'..131.....131.....',
+'.13321...12331....',
+'..123311133321....',
+'..123333333321....',
+'..125333335321....',
+'..123331133321....',
+'..112333333211.33.',
+'...1333333331.333.',
+'..13333333333.333.',
+'..13333333333.333.',
+'...1133333311.33..',
+'....11111111......',
+'..................',
+'..................']},
+jolteon:{s:3,p:P_JOLT,r:[
+'..11.......11.....',
+'.1221.....1221....',
+'.12321...12321....',
+'.123321.123321..1.',
+'..123311133321.121',
+'..123333333321121.',
+'..125333335321.1..',
+'..123331133321....',
+'..112333333211.11.',
+'...1222222221.121.',
+'..12222222222.121.',
+'..12122212122.11..',
+'...1121121211.....',
+'....11111111......',
+'..................',
+'..................']},
+flareon:{s:3,p:P_FLARE,r:[
+'..11.......11.....',
+'.1221.....1221....',
+'.12321...12321....',
+'.123321.123321....',
+'..123311133321....',
+'..123333333321....',
+'..125333335321....',
+'..123331133321....',
+'..112333333211.44.',
+'...1444444441.4441',
+'..14444444444.4441',
+'..14444444444.4441',
+'...1144444411.44..',
+'....11111111......',
+'..................',
+'..................']},
+dratini:{s:3,p:P_DRAG,r:[
+'................',
+'.....11111......',
+'....1233321.....',
+'...123333321....',
+'...125333521....',
+'...123333321....',
+'....1233321.....',
+'.....17771......',
+'.....12221......',
+'....1122211.....',
+'...112222111....',
+'..1122222211....',
+'.11222222211....',
+'.12222221111....',
+'.11222211.......',
+'..111111........']},
+dragonite:{s:3,p:P_DRGN,r:[
+'....11....11....',
+'...1221..1221...',
+'7..1221111221..7',
+'77.1233333321.77',
+'777123333332 777',
+'7712533353321177',
+'7712333333321177',
+'.7712331133211 7',
+'..1123333332 1..',
+'..1244444444 1..',
+'.124444444444 1.',
+'.124444444444 1.',
+'..1244444444 1..',
+'...1122222211...',
+'....112..211....',
+'....111..111....']},
+
+/* --- linha fantasma jogavel: Gastly -> Haunter -> Gengar --- */
+haunter:{s:3,p:{'1':'#2a1a3e','2':'#6a3aa0','3':'#9a68d0','4':'#1a0a2a','5':'#ffffff','6':'#e85a5a'},r:[
+'.22...........22..',
+'2332.........2332.',
+'23332...11...23332',
+'.2332.1122211.2332',
+'..22.112222211.22.',
+'.....11222222110..',
+'....1125222521 1..',
+'....1122222221 1..',
+'....1122666221 1..',
+'....11222222211...',
+'.22..112222211..22',
+'2332...111111..233',
+'23332.........2333',
+'.222...........222']},
+gengar:{s:3,p:{'1':'#2a1a3e','2':'#6a3aa0','3':'#9a68d0','4':'#1a0a2a','5':'#ffffff','6':'#e85a5a'},r:[
+'..3..........3....',
+'.333........333...',
+'.33331....13333...',
+'..133322223331....',
+'.13222222222231...',
+'.13252222252231...',
+'.13222222222231...',
+'.13211111111231...',
+'.13266666666231...',
+'.13211111111231...',
+'.13222222222231...',
+'.11322222222311...',
+'..11322222231 1...',
+'...113222231 1....',
+'...1122112211.....',
+'...1111..1111.....']},
+
+/* --- terceiros estagios: o apice, so pode existir 1 de cada em campo --- */
+charizard:{s:3,p:{'1':'#7a2a10','2':'#ee7a33','3':'#ffa860','4':'#fbe3bb','5':'#2b1d16','7':'#ffe066','8':'#ff7a18','9':'#2f6f80','6':'#4a97ab'},r:[
+'.........66699....',
+'....1...6669999...',
+'...11..66699991...',
+'..1221.6699991....',
+'.122221669991.8...',
+'.1233321699918 7..',
+'.125332169918787..',
+'.1233321691878 7..',
+'.12233116918787...',
+'..1244421.1878....',
+'.124444421.187....',
+'.1244444421.8.....',
+'.12444444421......',
+'.112444442111.....',
+'...1122221........',
+'...11....11.......']},
+venusaur:{s:3,p:P_GRAMA,r:[
+'....99..99..99....',
+'...9a99aa99a99....',
+'..99aaaaaaaa99....',
+'..9aaa9999aaa9....',
+'...99a8888a99.....',
+'..11888888881.....',
+'.122228888222 1...',
+'.122332222332221..',
+'.125232222325221..',
+'.122332222332221..',
+'.122321111232221..',
+'.122222222222221..',
+'.112444444444211..',
+'..11222222222211..',
+'...11.1111.1111...',
+'..................']},
+blastoise:{s:3,p:{'1':'#1a4a6b','2':'#6bc0e8','3':'#a8e0f5','4':'#c08040','5':'#2b1d16','6':'#9aa8b8','7':'#8a5528','8':'#f5e0b0','9':'#5a6878'},r:[
+'..................',
+'......11111.......',
+'.....1222221......',
+'....122333221.....',
+'....123333321.....',
+'....125333521.....',
+'....122311221.....',
+'.9661123332116 69.',
+'.966117444447166 9',
+'.99117478887471199',
+'...174788887471...',
+'...117444444711...',
+'....112222221 1...',
+'.....11....11.....',
+'..................',
+'..................']},
+machamp:{s:3,p:P_LUTA,r:[
+'..................',
+'.....17777771.....',
+'....123333321.....',
+'...12333333321....',
+'...12533335321....',
+'...12333333321....',
+'...11233333211....',
+'.121123333211121..',
+'.1221233332112211.',
+'.1221888888112211.',
+'.121123333211121..',
+'..1112222221111...',
+'...11222222211....',
+'...11222222211....',
+'...1121....1211...',
+'...1111....1111...']},
+alakazam:{s:3,p:P_PSI,r:[
+'...11.....11......',
+'..1221...1221.....',
+'..12211112211.....',
+'.1223333333321....',
+'.1233333333331....',
+'.1255333335531..7.',
+'.1233333333331.77.',
+'.1233111133331.7..',
+'.1144444444411.7..',
+'714444444444417...',
+'7714442222444177..',
+'.71444222244417...',
+'..14442222444 1...',
+'...1442222441.....',
+'...11222221 1.....',
+'....11111111......']},
+dragonair:{s:3,p:P_DRAG,r:[
+'......11111...7...',
+'.....1233321.777..',
+'....123333321.77..',
+'....125333521..7..',
+'....123333321.....',
+'.....1233321......',
+'.....1144411......',
+'.....14444 1......',
+'.....11222111.....',
+'....1122222211....',
+'...11224422221 1..',
+'..1122244422221...',
+'.11222244422222 1.',
+'.12222224422221...',
+'.11222222222211...',
+'..111111111111....']},
+
+/* --- inimigos novos --- */
+gastly:{s:2,p:{'1':'#2a1a3e','2':'#6a3aa0','3':'#9a68d0','4':'#1a0a2a','5':'#ffffff','6':'#e85a5a'},r:[
+'...33.....33....',
+'..3333...3333...',
+'.33344444443333.',
+'.3344444444443 .',
+'33444455554444 3',
+'33444455554444 3',
+'33444444444444 3',
+'.3344466644433..',
+'.33344444443333.',
+'..33344444333 ..',
+'...3333333333...',
+'....33...333....']},
+geodude_r:{s:2,p:{'1':'#2a2f38','2':'#6b7482','3':'#8b94a2','4':'#4a525e','5':'#2b1d16','6':'#e8453c'},r:[
+'................',
+'.....111111.....',
+'...1133333311...',
+'..113333333311..',
+'.11333333333311.',
+'4123333333333214',
+'4423355335533244',
+'4123355335533214',
+'.123333333333 1.',
+'.112333113333211',
+'..1123333333211.',
+'...112333332 1..',
+'....1122222 1...',
+'......111111....']},
+magnemite:{s:2,p:{'1':'#2a3040','2':'#a8b0be','3':'#d8dee8','4':'#2b1d16','5':'#ffffff','6':'#e8453c','7':'#3d7dd8','8':'#6b7280'},r:[
+'................',
+'.8...111111...8.',
+'688.1333331..886',
+'6688123333211886',
+'66.12333333 1.66',
+'...1234444321...',
+'...1234554321...',
+'...1234444321...',
+'...12333333 1...',
+'..8812333211886.',
+'.688.1333 1.8866',
+'.66...1111...66.',
+'.......88.......',
+'.......88.......']},
+onix:{s:2,p:{'1':'#2a2f3a','2':'#6b7482','3':'#8b94a2','4':'#4a525e','5':'#2b1d16','6':'#e8453c'},r:[
+'.......1111.....',
+'......133331....',
+'.....13333331...',
+'....1335335331..',
+'....1333333331..',
+'....1331111331..',
+'.....13333331...',
+'......133331....',
+'....11133311....',
+'...1332332331...',
+'...1332332331...',
+'....11133311....',
+'...13333333 1...',
+'..133233233 31..',
+'..133233233 31..',
+'...11333333 1...',
+'...1332332331...',
+'...1332332331...',
+'....113333311...',
+'.....1111111....']},
+espiao:{s:2,p:{'1':'#0a0a12','2':'#161622','3':'#242438','4':'#8a7a68','5':'#2b1d16','6':'#8a2a24','7':'#5a5a6a'},r:ARTE.grunt.r},
+elite2:{s:2,p:{'1':'#0a0a12','2':'#2a1030','3':'#5a2060','4':'#f0c8a0','5':'#2b1d16','6':'#a86fd6','7':'#c0c0d0','8':'#8a8aa0'},r:ARTE.elite.r},
+
+/* --- cenario --- */
+cristal:{s:3,p:{'1':'#3a2a5a','2':'#8a6fd6','3':'#c0a8f0','4':'#e8dcff'},r:[
+'....11..........',
+'...1321.........',
+'...1321....11...',
+'..13321...1321..',
+'..13321..13321..',
+'.133321.133321..',
+'.133321.133321..',
+'.1333211333321..',
+'.13333113333321.',
+'.113333333333 1.',
+'..1133333333 1..',
+'...111111111....']},
+cogumelo:{s:3,p:{'1':'#4a1a2a','2':'#c03a5a','3':'#e86a88','4':'#f0e0d0','5':'#c8b8a8'},r:[
+'....11111.......',
+'..113333311.....',
+'.13334333331....',
+'.13334433331....',
+'1333344333331...',
+'1333334333331...',
+'.11111111111....',
+'....14441.......',
+'....14541.......',
+'....14541.......',
+'...1145411......',
+'...1111111......']}
+};
+Object.assign(ARTE,ARTE2);
+/* versao torre do Gastly: mesmas linhas do inimigo, so que na escala das torres.
+   Precisa vir DEPOIS do Object.assign — dentro do literal ARTE2 o ARTE.gastly
+   ainda nao existe, e a referencia derruba o script inteiro em silencio. */
+ARTE.gastly3={s:3,p:ARTE.gastly.p,r:ARTE.gastly.r};
+const SPR={}; for(const k in ARTE) SPR[k]=montar(ARTE[k].p,ARTE[k].r,ARTE[k].s);
+const CACHE_URL={}; const urlSpr=k=>CACHE_URL[k]||(CACHE_URL[k]=SPR[k].toDataURL());
+
+/* ---------- 3. TIPOS ----------
+   Tabela real, escrita so com as excecoes: o que nao esta listado e 1x.
+   Tipo duplo multiplica - Onix (pedra+terra) leva 4x de Agua e de Grama. */
+const TIPOS={
+ normal:{n:'Normal',c:'#a8a878'}, fogo:{n:'Fogo',c:'#f08030'}, agua:{n:'Agua',c:'#6890f0'},
+ grama:{n:'Grama',c:'#78c850'}, eletrico:{n:'Eletrico',c:'#f8d030'}, gelo:{n:'Gelo',c:'#98d8d8'},
+ lutador:{n:'Lutador',c:'#c03028'}, veneno:{n:'Veneno',c:'#a040a0'}, terra:{n:'Terra',c:'#e0c068'},
+ voador:{n:'Voador',c:'#a890f0'}, psiquico:{n:'Psiquico',c:'#f85888'}, inseto:{n:'Inseto',c:'#a8b820'},
+ pedra:{n:'Pedra',c:'#b8a038'}, fantasma:{n:'Fantasma',c:'#705898'}, dragao:{n:'Dragao',c:'#7038f8'},
+ sombrio:{n:'Sombrio',c:'#705848'}, aco:{n:'Aco',c:'#b8b8d0'}, fada:{n:'Fada',c:'#ee99ac'}
+};
+const EFEITO={
+ normal:{pedra:.5,aco:.5,fantasma:0},
+ fogo:{grama:2,gelo:2,inseto:2,aco:2,fogo:.5,agua:.5,pedra:.5,dragao:.5},
+ agua:{fogo:2,terra:2,pedra:2,agua:.5,grama:.5,dragao:.5},
+ grama:{agua:2,terra:2,pedra:2,fogo:.5,grama:.5,veneno:.5,voador:.5,inseto:.5,dragao:.5,aco:.5},
+ eletrico:{agua:2,voador:2,eletrico:.5,grama:.5,dragao:.5,terra:0},
+ gelo:{grama:2,terra:2,voador:2,dragao:2,fogo:.5,agua:.5,gelo:.5,aco:.5},
+ lutador:{normal:2,gelo:2,pedra:2,sombrio:2,aco:2,veneno:.5,voador:.5,psiquico:.5,inseto:.5,fada:.5,fantasma:0},
+ veneno:{grama:2,fada:2,veneno:.5,terra:.5,pedra:.5,fantasma:.5,aco:0},
+ terra:{fogo:2,eletrico:2,veneno:2,pedra:2,aco:2,grama:.5,inseto:.5,voador:0},
+ voador:{grama:2,lutador:2,inseto:2,eletrico:.5,pedra:.5,aco:.5},
+ psiquico:{lutador:2,veneno:2,psiquico:.5,aco:.5,sombrio:0},
+ inseto:{grama:2,psiquico:2,sombrio:2,fogo:.5,lutador:.5,veneno:.5,voador:.5,fantasma:.5,aco:.5,fada:.5},
+ pedra:{fogo:2,gelo:2,voador:2,inseto:2,lutador:.5,terra:.5,aco:.5},
+ fantasma:{psiquico:2,fantasma:2,sombrio:.5,normal:0},
+ dragao:{dragao:2,aco:.5,fada:0},
+ sombrio:{psiquico:2,fantasma:2,lutador:.5,sombrio:.5,fada:.5},
+ aco:{gelo:2,pedra:2,fada:2,fogo:.5,agua:.5,eletrico:.5,aco:.5},
+ fada:{lutador:2,dragao:2,sombrio:2,fogo:.5,veneno:.5,aco:.5}
+};
+function efic(atk,alvo){
+  const t=EFEITO[atk]; if(!t) return 1;
+  let m=1; for(const d of alvo) m*= (t[d]!==undefined?t[d]:1);
+  return m;
+}
+
+/* ---------- 4. MAPAS ---------- */
+const MAPAS=[
+{id:'rota1', nome:'Rota 1', sub:'KANTO', dific:'Facil', hpMult:1, bolasFim:30, bolasRod:2, roubomax:20, dinIni:700, limite:10,
+ aviso:'O basico. Boa rota pra aprender a mira e a economia.',
+ cor:{solo:'#4e9a5c',s2:'rgba(70,140,84,.5)',s3:'rgba(96,178,106,.45)',g1:'rgba(126,200,132,.55)',g2:'rgba(58,120,70,.5)',
+      c1:'#6b5a38',c2:'#a8905e',c3:'#c9b184',p1:'rgba(160,132,88,.7)',p2:'rgba(224,204,166,.6)'},
+ caminho:[[-40,300],[130,300],[196,176],[330,136],[440,236],[440,404],[566,476],[706,436],[766,300],[700,186],[832,124],[884,124]],
+ centro:[916,124],
+ decor:[['arvore',60,120],['arvore',110,200],['arvore',30,430],['arvore',150,500],['arvore',270,470],
+        ['arvore',300,300],['arvore',560,120],['arvore',640,240],['arvore',880,330],['arvore',900,470],
+        ['arvore',700,560],['arvore',420,60],['arvore',180,60],['arvore',770,520],
+        ['pedra',230,250],['pedra',520,180],['pedra',350,530],['pedra',620,340],['pedra',830,240],
+        ['pedra',90,360],['pedra',480,330],['pedra',745,90]]},
+
+{id:'floresta', nome:'Floresta de Viridian', sub:'KANTO', dific:'Media', hpMult:1.25, bolasFim:60, bolasRod:4, roubomax:20, dinIni:800, limite:12,
+ aviso:'Escuro demais. Tem coisa camuflada aqui — sem faro, voce nao acerta.',
+ cor:{solo:'#2f6b45',s2:'rgba(36,88,56,.55)',s3:'rgba(62,124,78,.5)',g1:'rgba(96,168,110,.5)',g2:'rgba(26,70,44,.55)',
+      c1:'#3d3020',c2:'#6d573a',c3:'#8e7550',p1:'rgba(110,88,58,.7)',p2:'rgba(170,148,108,.45)'},
+ caminho:[[-40,90],[150,90],[212,208],[96,300],[96,432],[250,506],[392,436],[392,286],[506,206],[648,266],[668,428],[800,506],[928,440]],
+ centro:[900,300],
+ decor:[['arvore',60,190],['arvore',20,370],['arvore',180,380],['arvore',290,150],['arvore',330,330],
+        ['arvore',180,560],['arvore',470,80],['arvore',530,340],['arvore',560,470],['arvore',720,110],
+        ['arvore',790,230],['arvore',880,120],['arvore',900,560],['arvore',40,520],['arvore',680,570],
+        ['arvore',430,570],['arvore',260,270],['arvore',600,180],
+        ['cogumelo',120,230],['cogumelo',300,470],['cogumelo',480,520],['cogumelo',700,340],
+        ['cogumelo',860,360],['cogumelo',230,140],['pedra',420,180],['pedra',560,560],['pedra',760,380]]},
+
+{id:'montelua', nome:'Monte Lua', sub:'KANTO', dific:'Dificil', hpMult:1.6, bolasFim:110, bolasRod:7, roubomax:25, dinIni:950, limite:14,
+ aviso:'Caverna cheia de Pedra/Terra. Eletrico nao encosta neles.',
+ cor:{solo:'#494460',s2:'rgba(56,50,78,.55)',s3:'rgba(94,86,120,.45)',g1:'rgba(132,122,166,.35)',g2:'rgba(38,34,56,.5)',
+      c1:'#4e4762',c2:'#847c94',c3:'#a49cb6',p1:'rgba(116,108,136,.6)',p2:'rgba(198,190,214,.45)'},
+ caminho:[[480,-40],[480,110],[240,178],[150,330],[286,436],[520,436],[646,340],[560,204],[724,146],[868,232],[836,406],[690,516],[420,548],[196,516],[128,404]],
+ centro:[96,330],
+ decor:[['cristal',330,80],['cristal',620,90],['cristal',760,420],['cristal',300,300],['cristal',60,180],
+        ['cristal',920,140],['cristal',560,560],['cristal',180,240],
+        ['pedra',390,240],['pedra',700,240],['pedra',420,340],['pedra',880,340],['pedra',240,420],
+        ['pedra',600,500],['pedra',120,90],['pedra',900,540],['pedra',540,120],['pedra',760,60],
+        ['pedra',60,470],['pedra',330,560]]}
+];
+
+/* ---------- 5. POKEMON JOGAVEIS ---------- */
+const RARIDADE={
+  inicial:  {n:'Inicial',   c:'#7fb4ff', ch:.12},
+  comum:    {n:'Comum',     c:'#8b9ab4', ch:.12},
+  incomum:  {n:'Incomum',   c:'#4cc76a', ch:.05},
+  raro:     {n:'Raro',      c:'#3d7dd8', ch:.025},
+  lendario: {n:'Lendario',  c:'#ffcb05', ch:.012}
+};
+const PITY=100;
+
+const POKE={
+ charmander:{nome:'Charmander', spr:'charmander', tipo:'fogo', rar:'inicial', custo:150,
+  desc:'Rapido, alvo unico. O alicerce de qualquer defesa.',
+  base:{alcance:112,cad:.55,dano:1,pierce:1,velproj:340,proj:'brasa',ataque:'fogo'},
+  ups:[{n:'Brasa Ampliada',c:90,d:'+38 de alcance e +1 de penetracao.',f:s=>{s.alcance+=38;s.pierce+=1;}},
+       {n:'Lanca-Chamas',c:260,d:'Dano 2 e cadencia bem mais rapida.',f:s=>{s.dano=2;s.cad=.4;}},
+       {n:'Charmeleon',c:780,evo:'charmeleon',d:'EVOLUCAO. Dano 3, penetracao 4, cospe fogo sem parar.',f:s=>{s.dano=3;s.cad=.28;s.pierce=4;s.alcance+=22;}},
+       {n:'Charizard',c:2200,evo:'charizard',final:true,d:'APICE. Dano 8, penetracao 6, alcance de voo. So pode existir um.',f:s=>{s.dano=8;s.cad=.2;s.pierce=6;s.alcance+=45;}}]},
+
+ bulbasaur:{nome:'Bulbasaur', spr:'bulbasaur', tipo:'grama', rar:'inicial', custo:275,
+  desc:'Vinha que atravessa varios inimigos e deixa tudo lento.',
+  base:{alcance:96,cad:1.0,dano:1,pierce:4,velproj:230,proj:'vinha',ataque:'grama',lento:.7,lentoT:1.0},
+  ups:[{n:'Folha Navalha',c:170,d:'Dano 2 e penetracao 6.',f:s=>{s.dano=2;s.pierce=6;}},
+       {n:'Sonifero',c:380,d:'Lentidao muito mais forte e duradoura.',f:s=>{s.lento=.42;s.lentoT=1.8;}},
+       {n:'Ivysaur',c:900,evo:'ivysaur',d:'EVOLUCAO. Dano 3, penetracao 9, chicoteia o dobro de rapido.',f:s=>{s.dano=3;s.pierce=9;s.cad=.6;s.alcance+=26;}},
+       {n:'Venusaur',c:2400,evo:'venusaur',final:true,d:'APICE. Dano 9, atravessa 14 e prende quase parado. So pode existir um.',f:s=>{s.dano=9;s.pierce=14;s.cad=.45;s.lento=.3;s.lentoT=2.2;s.alcance+=40;}}]},
+
+ squirtle:{nome:'Squirtle', spr:'squirtle', tipo:'agua', rar:'inicial', custo:300,
+  desc:'Bolha que estoura em area. Agua faz 4x em Pedra+Terra.',
+  base:{alcance:100,cad:.95,dano:2,pierce:1,area:44,velproj:260,proj:'bolha',ataque:'agua'},
+  ups:[{n:'Bolha Dupla',c:180,d:'Dano 3 e explosao maior.',f:s=>{s.dano=3;s.area=54;}},
+       {n:'Hidro Bomba',c:420,d:'Dano 5, mais rapida e com mais alcance.',f:s=>{s.dano=5;s.cad=.75;s.alcance+=26;}},
+       {n:'Wartortle',c:950,evo:'wartortle',d:'EVOLUCAO. Dano 7 e explosao que cobre meia curva.',f:s=>{s.dano=7;s.area=70;s.cad=.6;s.alcance+=20;}},
+       {n:'Blastoise',c:2500,evo:'blastoise',final:true,d:'APICE. Canhoes: dano 16 e explosao gigante. So pode existir um.',f:s=>{s.dano=16;s.area=94;s.cad=.55;s.alcance+=40;}}]},
+
+ pikachu:{nome:'Pikachu', spr:'pikachu', tipo:'eletrico', rar:'comum', custo:400,
+  desc:'Raio que salta entre inimigos. Nao encosta em tipo Terra.',
+  base:{alcance:124,cad:1.05,dano:2,pierce:1,proj:'raio',saltos:3,saltoR:88,ataque:'eletrico'},
+  ups:[{n:'Agilidade',c:260,d:'Cadencia 40% mais rapida.',f:s=>{s.cad=.68;}},
+       {n:'Choque do Trovao',c:520,d:'Dano 3 e salta em 5 alvos.',f:s=>{s.dano=3;s.saltos=5;}},
+       {n:'Raichu',c:1250,evo:'raichu',final:true,d:'APICE. Dano 5, 8 saltos, alcance enorme. So pode existir um.',f:s=>{s.dano=5;s.saltos=8;s.saltoR=112;s.alcance+=40;s.cad=.6;}}]},
+
+ machop:{nome:'Machop', spr:'machop', tipo:'lutador', rar:'comum', custo:350,
+  desc:'Corpo a corpo. Alcance minusculo, dano absurdo. Nao toca em Fantasma.',
+  base:{alcance:60,cad:.3,dano:4,pierce:2,proj:'soco',ataque:'lutador'},
+  ups:[{n:'Golpe Baixo',c:200,d:'Dano 6 e um pouco mais de alcance.',f:s=>{s.dano=6;s.alcance+=14;}},
+       {n:'Sismo',c:480,d:'Cada golpe acerta 4 inimigos de uma vez.',f:s=>{s.pierce=4;s.dano=8;}},
+       {n:'Machoke',c:1100,evo:'machoke',d:'EVOLUCAO. Dano 13, soco a cada 0,2s, acerta 6.',f:s=>{s.dano=13;s.cad=.2;s.pierce=6;s.alcance+=18;}},
+       {n:'Machamp',c:2800,evo:'machamp',final:true,d:'APICE. Quatro bracos: dano 26 em 8 alvos. So pode existir um.',f:s=>{s.dano=26;s.cad=.18;s.pierce=8;s.alcance+=26;}}]},
+
+ growlithe:{nome:'Growlithe', spr:'growlithe', tipo:'fogo', rar:'incomum', custo:500,
+  desc:'FARO AGUCADO: e o unico que enxerga camuflado desde o inicio.',
+  base:{alcance:118,cad:.5,dano:2,pierce:2,velproj:380,proj:'brasa',ataque:'fogo',detecta:true},
+  ups:[{n:'Faro Ampliado',c:260,d:'+45 de alcance. Cheira de longe.',f:s=>{s.alcance+=45;}},
+       {n:'Presas de Fogo',c:540,d:'Dano 4 e penetracao 3.',f:s=>{s.dano=4;s.pierce=3;}},
+       {n:'Arcanine',c:1400,evo:'arcanine',final:true,d:'APICE. Dano 6, penetracao 5, cadencia de metralhadora. So pode existir um.',f:s=>{s.dano=6;s.cad=.3;s.pierce=5;s.alcance+=40;}}]},
+
+ abra:{nome:'Abra', spr:'abra', tipo:'psiquico', rar:'incomum', custo:600,
+  desc:'Onda psiquica que varre a fila inteira. 2x em Veneno, zero em Sombrio.',
+  base:{alcance:140,cad:1.2,dano:4,pierce:6,velproj:200,proj:'psi',ataque:'psiquico'},
+  ups:[{n:'Confusao',c:320,d:'Dano 6.',f:s=>{s.dano=6;}},
+       {n:'Premonicao',c:700,d:'Cadencia melhor e atravessa 10 inimigos.',f:s=>{s.cad=.8;s.pierce=10;}},
+       {n:'Kadabra',c:1600,evo:'kadabra',d:'EVOLUCAO. Dano 10, alcance imenso e enxerga camuflado.',f:s=>{s.dano=10;s.alcance+=50;s.detecta=true;}},
+       {n:'Alakazam',c:3200,evo:'alakazam',final:true,d:'APICE. Dano 22 varrendo 16 inimigos de uma vez. So pode existir um.',f:s=>{s.dano=22;s.pierce=16;s.cad=.6;s.alcance+=60;}}]},
+
+ eevee:{nome:'Eevee', spr:'eevee', tipo:'normal', rar:'raro', custo:550,
+  desc:'Fraco sozinho — mas no terceiro treino VOCE escolhe em que ele evolui.',
+  base:{alcance:110,cad:.6,dano:2,pierce:2,velproj:320,proj:'invest',ataque:'normal'},
+  ups:[{n:'Adaptavel',c:250,d:'Dano 3 e +30 de alcance.',f:s=>{s.dano=3;s.alcance+=30;}},
+       {n:'Reserva',c:500,d:'Cadencia bem mais rapida e penetracao 3.',f:s=>{s.cad=.45;s.pierce=3;}},
+       {n:'Pedra Elemental',c:0,ramo:[
+         {n:'Vaporeon',c:1300,evo:'vaporeon',final:true,d:'AGUA. Dano 7 em area. Derrete Pedra e Terra.',f:s=>{s.dano=7;s.ataque='agua';s.area=58;s.proj='bolha';s.cad=.7;}},
+         {n:'Jolteon',c:1300,evo:'jolteon',final:true,d:'ELETRICO. Dano 5 a cada 0,2s. Metralha voadores.',f:s=>{s.dano=5;s.ataque='eletrico';s.cad=.2;s.velproj=460;}},
+         {n:'Flareon',c:1300,evo:'flareon',final:true,d:'FOGO. Dano 13, penetracao 6. Um tiro, muita gente.',f:s=>{s.dano=13;s.ataque='fogo';s.pierce=6;s.cad=1.0;}}
+       ],d:'Escolha uma evolucao. Nao da pra voltar atras.'}]},
+
+ gastly:{nome:'Gastly', spr:'gastly3', tipo:'fantasma', rar:'raro', custo:650,
+  desc:'Fantasma enxerga fantasma: ve camuflado e atravessa parede. Zero em Normal.',
+  base:{alcance:132,cad:.85,dano:3,pierce:5,velproj:210,proj:'sombra',ataque:'fantasma',detecta:true},
+  ups:[{n:'Lambida',c:300,d:'Dano 5 e deixa o alvo lento.',f:s=>{s.dano=5;s.lento=.6;s.lentoT=1.4;}},
+       {n:'Bola Sombria',c:620,d:'Dano 8, atravessa 8, mais rapido.',f:s=>{s.dano=8;s.pierce=8;s.cad=.65;}},
+       {n:'Haunter',c:1500,evo:'haunter',d:'EVOLUCAO. Dano 12 e alcance de assombracao.',f:s=>{s.dano=12;s.pierce=10;s.alcance+=45;s.cad=.55;}},
+       {n:'Gengar',c:3400,evo:'gengar',final:true,d:'APICE. Dano 26 atravessando 14. Ignora resistencia de armadura. So pode existir um.',f:s=>{s.dano=26;s.pierce=14;s.cad=.45;s.alcance+=40;s.ignoraResist=true;}}]},
+
+ dratini:{nome:'Dratini', spr:'dratini', tipo:'dragao', rar:'lendario', custo:900,
+  desc:'Nunca leva imunidade: acerta todo mundo. So o Magnemite (Aco) resiste.',
+  base:{alcance:130,cad:.9,dano:5,pierce:3,velproj:300,proj:'dragao',ataque:'dragao'},
+  ups:[{n:'Furia do Dragao',c:500,d:'Dano 8.',f:s=>{s.dano=8;}},
+       {n:'Danca do Dragao',c:1100,d:'Cadencia quase o dobro e +30 de alcance.',f:s=>{s.cad=.6;s.alcance+=30;}},
+       {n:'Dragonair',c:1400,evo:'dragonair',d:'EVOLUCAO. Dano 12, penetracao 5 e +40 de alcance.',f:s=>{s.dano=12;s.pierce=5;s.cad=.55;s.alcance+=40;}},
+       {n:'Dragonite',c:4200,evo:'dragonite',final:true,d:'APICE. Dano 30, enxerga camuflado, acaba com a conversa. So pode existir um.',f:s=>{s.dano=30;s.pierce=8;s.cad=.35;s.detecta=true;s.alcance+=55;}}]}
+};
+const LISTA_POKE=['charmander','bulbasaur','squirtle','pikachu','machop','growlithe','abra','gastly','eevee','dratini'];
+const INICIAIS=['charmander','bulbasaur','squirtle'];
+const MIRAS=[['primeiro','1o'],['ultimo','Ult'],['forte','Forte'],['perto','Perto']];
+
+/* ---------- 6. INIMIGOS ---------- */
+const INIMIGOS={
+ rattata:{nome:'Rattata',hp:4,vel:64,spr:'rattata',rec:2,roubo:1,raio:11,tipos:['normal']},
+ zubat:{nome:'Zubat',hp:6,vel:84,spr:'zubat',rec:2,roubo:1,raio:11,voa:true,tipos:['veneno','voador']},
+ ekans:{nome:'Ekans',hp:12,vel:70,spr:'ekans',rec:3,roubo:1,raio:12,tipos:['veneno']},
+ koffing:{nome:'Koffing',hp:26,vel:40,spr:'koffing',rec:5,roubo:2,raio:12,voa:true,tipos:['veneno']},
+ gastly:{nome:'Gastly',hp:20,vel:62,spr:'gastly',rec:6,roubo:2,raio:13,voa:true,camu:true,tipos:['fantasma','veneno']},
+ grunt:{nome:'Recruta Rocket',hp:34,vel:46,spr:'grunt',rec:8,roubo:2,raio:13,tipos:['normal'],filhos:['rattata','rattata']},
+ espiao:{nome:'Espiao Rocket',hp:42,vel:52,spr:'espiao',rec:10,roubo:2,raio:13,camu:true,tipos:['normal'],filhos:['rattata','rattata']},
+ geodude_r:{nome:'Geodude Roubado',hp:75,vel:30,spr:'geodude_r',rec:13,roubo:3,raio:14,resist:.85,tipos:['pedra','terra']},
+ magnemite:{nome:'Magnemite Roubado',hp:48,vel:78,spr:'magnemite',rec:11,roubo:2,raio:12,voa:true,tipos:['eletrico','aco']},
+ elite:{nome:'Rocket de Elite',hp:95,vel:36,spr:'elite',rec:22,roubo:4,raio:14,resist:.75,tipos:['normal'],filhos:['grunt','grunt']},
+ elite2:{nome:'Rocket das Sombras',hp:140,vel:34,spr:'elite2',rec:32,roubo:5,raio:14,resist:.7,camu:true,tipos:['sombrio'],filhos:['espiao','espiao']},
+ meowth:{nome:'Balao do Meowth',hp:450,vel:24,spr:'balao',rec:150,roubo:10,raio:24,resist:.85,voa:true,chefe:true,tipos:['normal','voador'],filhos:['grunt','grunt','grunt','grunt']},
+ meowthc:{nome:'Balao Fantasma',hp:420,vel:26,spr:'balao',rec:180,roubo:10,raio:24,resist:.85,voa:true,camu:true,chefe:true,tipos:['fantasma','voador'],filhos:['espiao','espiao','gastly','gastly']},
+ onix:{nome:'Onix Mecanico',hp:1800,vel:18,spr:'onix',rec:600,roubo:15,raio:30,resist:.8,chefe:true,tipos:['pedra','terra'],filhos:['geodude_r','geodude_r','geodude_r','geodude_r']}
+};
+
+/* ---------- 7. RODADAS ---------- */
+const R=(...g)=>g.map(a=>({t:a[0],n:a[1],g:a[2],e:a[3]||0}));
+const RODADAS={
+rota1:[
+ R(['rattata',8,.75]), R(['rattata',14,.5]), R(['rattata',10,.45],['zubat',5,.6,4]),
+ R(['zubat',10,.45],['rattata',10,.4,2]), R(['ekans',8,.7],['rattata',12,.35,3]),
+ R(['koffing',6,1],['zubat',10,.35,2]), R(['grunt',4,1.6],['ekans',10,.5,2]),
+ R(['koffing',10,.7],['grunt',5,1.4,4]),
+ R(['elite',2,4],['grunt',6,1.1,2],['zubat',14,.3,6]),
+ R(['grunt',6,1.2],['meowth',1,1,7])],
+floresta:[
+ R(['rattata',10,.6]), R(['rattata',14,.45],['zubat',4,.7,3]), R(['zubat',12,.4],['ekans',6,.7,2]),
+ R(['espiao',3,2],['rattata',12,.4,1]), R(['ekans',10,.5],['zubat',10,.35,3]),
+ R(['espiao',5,1.4],['koffing',5,1,2]), R(['gastly',6,.9],['rattata',14,.35,2]),
+ R(['koffing',10,.6],['grunt',4,1.5,3]), R(['gastly',10,.6],['espiao',5,1.2,2]),
+ R(['grunt',6,1.2],['zubat',16,.28,2]), R(['elite',2,3.5],['koffing',10,.55,2]),
+ R(['gastly',14,.45],['grunt',6,1.1,3]),
+ R(['espiao',8,.9],['elite',3,2.5,2],['zubat',18,.25,4]),
+ R(['grunt',10,.8],['gastly',12,.5,3],['koffing',12,.5,6]),
+ R(['grunt',8,1],['meowthc',1,1,8])],
+montelua:[
+ R(['zubat',12,.5]), R(['zubat',16,.38],['rattata',10,.45,3]),
+ R(['geodude_r',4,1.6],['zubat',14,.35,2]), R(['ekans',12,.45],['geodude_r',5,1.4,3]),
+ R(['geodude_r',8,1],['zubat',18,.3,2]), R(['koffing',10,.6],['grunt',4,1.6,3]),
+ R(['grunt',6,1.2],['geodude_r',8,1,2]), R(['magnemite',8,.7],['zubat',20,.25,3]),
+ R(['geodude_r',12,.8],['koffing',12,.55,3]), R(['elite',3,2.5],['magnemite',10,.6,2]),
+ R(['grunt',10,.9],['gastly',10,.6,3]), R(['elite2',3,3],['espiao',6,1.1,2]),
+ R(['magnemite',14,.5],['geodude_r',12,.8,3]), R(['grunt',12,.8],['elite',4,2.2,3]),
+ R(['gastly',16,.4],['elite2',4,2.4,3],['zubat',22,.22,6]),
+ R(['geodude_r',16,.6],['magnemite',16,.45,3]), R(['elite',6,1.8],['grunt',14,.7,3]),
+ R(['elite2',6,1.8],['gastly',18,.4,3]),
+ R(['meowth',1,1],['elite',5,2,4],['magnemite',18,.4,6]),
+ R(['grunt',10,.9],['elite2',5,2,4],['onix',1,1,10])]
+};
+
+/* ---------- 8. POKEBOLA (icone da moeda) ---------- */
+ARTE.pokebola={s:2,p:{'1':'#241818','2':'#e8453c','3':'#f2f2f5','4':'#ffffff','5':'#9aa0ac'},r:[
+'....1111....','..11222211..','.1222222221.','.1222222221.','122211112221','111145541111',
+'111145541111','133311113331','.1333333331.','.1333333331.','..11333311..','....1111....']};
+SPR.pokebola=montar(ARTE.pokebola.p,ARTE.pokebola.r,ARTE.pokebola.s);
+
+/* ---------- 9. SAVE ---------- */
+const CHAVE='decolando-de-novo:v2';
+let SAVE={inicial:null,tem:{},bolas:0,tiros:{},feitos:{},equipe:[],recordes:{},
+  xp:{},arvore:{},shiny:{},po:0,fichas:0,tms:{},tmEquip:{}};
+const SAVE_VAZIO=()=>({inicial:null,tem:{},bolas:0,tiros:{},feitos:{},equipe:[],recordes:{},
+  xp:{},arvore:{},shiny:{},po:0,fichas:0,tms:{},tmEquip:{}});
+function carregar(){
+  try{const b=localStorage.getItem(CHAVE); if(b) SAVE=Object.assign(SAVE,JSON.parse(b));}catch(e){}
+}
+function salvar(){
+  try{localStorage.setItem(CHAVE,JSON.stringify(SAVE));}catch(e){}
+}
+carregar();
+const possui=k=>!!SAVE.tem[k];
+const nPossui=()=>LISTA_POKE.filter(possui).length;
+function mapaLiberado(i){
+  if(i===0||TESTE) return true;
+  return !!SAVE.feitos[MAPAS[i-1].id];
+}
+
+/* ---------- 10. ESTADO ---------- */
+let mapa=MAPAS[0], SEG=[], TOTAL=0, FUNDO=null;
+let dinheiro=0, roubados=0, ROUBO_MAX=20, rodada=0, pops=0, bolasGanhas=0;
+let emOnda=false, pausado=false, velocidade=1, mudo=false, fim=false, jogando=false;
+let inimigos=[], torres=[], projeteis=[], particulas=[], raios=[], flutuantes=[], socos=[];
+let fila=[], idSeq=1, tOnda=0;
+let comprando=null, sel=null, mouse={x:-999,y:-999,dentro:false};
+let equipe=[], mapaEscolhido=0;
+/* modo teste: dinheiro alto, tudo liberado, sem limite de unidades.
+   Nao grava progresso nenhum no save - e uma bancada, nao uma partida. */
+let TESTE=false, autoRodada=false, esperaAuto=0;
+let xpPartida={}, poGanho=0, fichasGanhas=0;
+const VELOCIDADES=[1,5,10];
+function limiteUnid(){ return TESTE?99:mapa.limite; }
+function temFinalEmCampo(spr){ return torres.some(t=>t.spr===spr); }
+
+/* ---------- 11. TELAS ---------- */
+const TELAS=['tMenu','tInicial','tMapa','tEquipe','tSafari','tTreino','tArvore','tCassino','tJogo'];
+let telaAtual='tMenu';
+function irPara(t){
+  telaAtual=t;
+  for(const x of TELAS) $(x).style.display = (x===t?'':'none');
+  if(t==='tMenu') pintarMenu();
+  if(t==='tInicial') pintarInicial();
+  if(t==='tMapa') pintarMapas();
+  if(t==='tEquipe') pintarEquipe();
+  if(t==='tSafari') pintarSafari();
+  if(t==='tTreino') pintarTreino();
+  if(t==='tArvore') pintarArvore(arvoreAberta);
+  if(t==='tCassino') pintarCassino();
+}
+function chip(tipo){
+  const T=TIPOS[tipo];
+  return '<span class="chip" style="background:'+T.c+'22;color:'+T.c+';border-color:'+T.c+'66">'+T.n+'</span>';
+}
+function bolaHTML(n){ return '<span class="bolas"><img src="'+urlSpr('pokebola')+'">'+n+'</span>'; }
+
+/* --- menu --- */
+function pintarMenu(){
+  $('mBolas').innerHTML=bolaHTML(SAVE.bolas);
+  $('mColecao').textContent=nPossui()+'/'+LISTA_POKE.length;
+  const f=MAPAS.filter(m=>SAVE.feitos[m.id]).length;
+  $('mMapas').textContent=f+'/'+MAPAS.length;
+  $('mPo').textContent=SAVE.po;
+  $('mFichas').textContent=SAVE.fichas;
+}
+
+/* --- escolha do inicial --- */
+function pintarInicial(){
+  const el=$('gradeInicial'); el.innerHTML='';
+  for(const k of INICIAIS){
+    const p=POKE[k];
+    const d=document.createElement('button');
+    d.className='esc';
+    d.innerHTML='<img src="'+urlSpr(p.spr)+'"><div class="n">'+p.nome+'</div>'+
+      chip(p.tipo)+'<div class="d">'+p.desc+'</div>';
+    d.onclick=()=>{
+      SAVE.inicial=k; SAVE.tem[k]=true; SAVE.equipe=[k]; salvar();
+      som(660,.1,'triangle',.05); setTimeout(()=>som(880,.14,'triangle',.05),110);
+      avisarTela('Voce escolheu '+p.nome+'!');
+      irPara('tMenu');
+    };
+    el.appendChild(d);
+  }
+}
+
+/* --- selecao de mapa --- */
+function miniMapa(m){
+  const w=228,h=143,c=document.createElement('canvas');
+  c.width=w; c.height=h;
+  const g=c.getContext('2d'), ex=w/LARG, ey=h/ALT;
+  g.fillStyle=m.cor.solo; g.fillRect(0,0,w,h);
+  g.strokeStyle=m.cor.c1; g.lineWidth=9; g.lineJoin='round'; g.lineCap='round';
+  g.beginPath(); g.moveTo(m.caminho[0][0]*ex,m.caminho[0][1]*ey);
+  for(let i=1;i<m.caminho.length;i++) g.lineTo(m.caminho[i][0]*ex,m.caminho[i][1]*ey);
+  g.stroke();
+  g.strokeStyle=m.cor.c3; g.lineWidth=6; g.stroke();
+  for(const [k,x,y] of m.decor){
+    g.fillStyle=k==='cristal'?'#8a6fd6':k==='cogumelo'?'#c03a5a':k==='pedra'?'#6b7280':'#2f7a4a';
+    g.fillRect(x*ex-2,y*ey-2,4,4);
+  }
+  return c.toDataURL();
+}
+function pintarMapas(){
+  const el=$('gradeMapa'); el.innerHTML='';
+  MAPAS.forEach((m,i)=>{
+    const lib=mapaLiberado(i), feito=!!SAVE.feitos[m.id];
+    const d=document.createElement('div');
+    d.className='mapa'+(lib?'':' trancado');
+    d.innerHTML='<img src="'+miniMapa(m)+'">'+
+      '<div class="corpo"><div class="l"><b>'+m.nome+'</b>'+
+      '<span class="dif d'+m.dific+'">'+m.dific+'</span></div>'+
+      '<div class="d">'+m.aviso+'</div>'+
+      '<div class="l2">'+RODADAS[m.id].length+' rodadas · '+bolaHTML(feito?Math.round(m.bolasFim*.4):m.bolasFim)+
+      (feito?' <span class="ok">✓ limpo</span>':' <span class="novo">1a vez</span>')+'</div></div>'+
+      (lib?'':'<div class="cadeado">Limpe '+MAPAS[i-1].nome+' primeiro</div>');
+    if(lib) d.onclick=()=>{ mapaEscolhido=i; irPara('tEquipe'); };
+    el.appendChild(d);
+  });
+}
+
+/* --- selecao de equipe --- */
+function temCamu(m){
+  return RODADAS[m.id].some(r=>r.some(g=>INIMIGOS[g.t].camu));
+}
+function pintarEquipe(){
+  const m=MAPAS[mapaEscolhido];
+  const disp=k=>TESTE||possui(k);
+  equipe=(SAVE.equipe||[]).filter(disp).slice(0,6);
+  if(!equipe.length && SAVE.inicial) equipe=[SAVE.inicial];
+  $('eqMapa').textContent=m.nome;
+  const el=$('gradeEquipe'); el.innerHTML='';
+  for(const k of LISTA_POKE){
+    if(!disp(k)) continue;
+    const p=POKE[k], dentro=equipe.includes(k);
+    const d=document.createElement('button');
+    d.className='eqc'+(dentro?' dentro':'');
+    d.innerHTML='<img src="'+urlSpr(p.spr)+'"><div class="n">'+p.nome+'</div>'+chip(p.base.ataque)+
+      (p.base.detecta?'<div class="faro">FARO</div>':'')+
+      '<div class="cst">'+p.custo+'</div>';
+    d.onclick=()=>{
+      if(dentro) equipe=equipe.filter(x=>x!==k);
+      else if(equipe.length<6) equipe.push(k);
+      else { avisarTela('O time so leva 6.'); return; }
+      SAVE.equipe=equipe; salvar(); pintarEquipe(); som(520,.05,'square',.03);
+    };
+    el.appendChild(d);
+  }
+  $('eqConta').textContent=equipe.length+'/6';
+  const semFaro = temCamu(m) && !equipe.some(k=>POKE[k].base.detecta || POKE[k].ups.some(u=>u.n==='Kadabra'||u.n==='Dragonite'));
+  $('eqAviso').style.display = semFaro?'':'none';
+  $('eqIr').disabled = equipe.length===0;
+}
+
+/* --- safari (gacha mirado com pity) --- */
+let alvoSafari=null;
+function chanceDe(k){
+  const t=SAVE.tiros[k]||0;
+  let ch=RARIDADE[POKE[k].rar].ch;
+  if(t>PITY/2) ch += (t-PITY/2)/(PITY/2)*.35;
+  return Math.min(1,ch);
+}
+function pintarSafari(){
+  $('sfBolas').innerHTML=bolaHTML(SAVE.bolas);
+  const el=$('gradeSafari'); el.innerHTML='';
+  for(const k of LISTA_POKE){
+    const p=POKE[k], tem=possui(k), t=SAVE.tiros[k]||0, r=RARIDADE[p.rar];
+    const d=document.createElement('div');
+    d.className='sfc'+(tem?' tem':'')+(alvoSafari===k?' alvo':'');
+    d.innerHTML='<img src="'+urlSpr(p.spr)+'" class="'+(tem?'':'silhueta')+'">'+
+      '<div class="n">'+(tem?p.nome:'???')+'</div>'+
+      '<div class="rar" style="color:'+r.c+'">'+r.n+'</div>'+
+      (tem?'<div class="capt">✓ na equipe</div>'
+         :'<div class="pity"><i style="width:'+Math.min(100,t/PITY*100)+'%"></i></div>'+
+          '<div class="pt">'+t+'/'+PITY+' tiros · '+Math.round(chanceDe(k)*100)+'%</div>');
+    if(!tem) d.onclick=()=>{ alvoSafari=k; pintarSafari(); };
+    el.appendChild(d);
+  }
+  const a=alvoSafari && !possui(alvoSafari) ? alvoSafari : null;
+  $('sfPainel').style.display = a?'':'none';
+  if(a){
+    $('sfNome').textContent='Mirando em '+POKE[a].nome;
+    $('sf1').disabled = SAVE.bolas<1;
+    $('sf10').disabled = SAVE.bolas<10;
+  }
+}
+function atirar(k,n){
+  let capturou=false, gastas=0;
+  for(let i=0;i<n;i++){
+    if(SAVE.bolas<1||possui(k)) break;
+    SAVE.bolas--; gastas++;
+    const t=(SAVE.tiros[k]||0)+1; SAVE.tiros[k]=t;
+    if(t>=PITY || Math.random()<chanceDe(k)){ SAVE.tem[k]=true; capturou=true; break; }
+  }
+  salvar();
+  const c=document.querySelector('.sfc.alvo');
+  if(c){ c.classList.remove('tremer'); void c.offsetWidth; c.classList.add('tremer'); }
+  if(capturou){
+    som(660,.1,'triangle',.05); setTimeout(()=>som(880,.1,'triangle',.05),110);
+    setTimeout(()=>som(1100,.2,'triangle',.05),220);
+    avisarTela('Gotcha! '+POKE[k].nome+' foi capturado!');
+    alvoSafari=null;
+  } else {
+    som(300,.12,'square',.04);
+    if(gastas) avisarTela(POKE[k].nome+' escapou. ('+gastas+' bola'+(gastas>1?'s':'')+')');
+    else avisarTela('Sem pokebolas. Limpe um mapa.');
+  }
+  pintarSafari();
+}
+function avisarTela(txt){
+  const el=$('avisoTela'); el.textContent=txt; el.style.opacity=1;
+  clearTimeout(el._t); el._t=setTimeout(()=>el.style.opacity=0,2200);
+}
+/* ---------- 7. EFEITOS ---------- */
+/* a assinatura do jogo: derrotado nao "morre", ele DECOLA */
+function decolar(x,y,esc){
+  particulas.push({tipo:'estrela', x, y, vx:60+Math.random()*70, vy:-210-Math.random()*70,
+    g:40, t:.85*esc, max:.85*esc, r:6*esc});
+  for(let i=0;i<4+esc*3;i++){
+    const a=Math.random()*6.283, v=40+Math.random()*90;
+    particulas.push({tipo:'brilho', x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v-30, g:120,
+      t:.35+Math.random()*.25, max:.6, r:2.5*esc});
+  }
+  particulas.push({tipo:'anel', x, y, vx:0, vy:0, g:0, t:.28, max:.28, r:8*esc});
+}
+function faisca(x,y,tipo){
+  const cor = tipo==='vinha' ? '#9ee2c6' : '#ffcb05';
+  for(let i=0;i<3;i++){
+    const a=Math.random()*6.283, v=30+Math.random()*60;
+    particulas.push({tipo:'brilho', x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v, g:180,
+      t:.18+Math.random()*.12, max:.3, r:2, cor});
+  }
+}
+function flutuar(x,y,txt,cor,t){ flutuantes.push({x,y,txt,cor,t,max:t}); }
+function avisar(txt,cor){
+  const el=$('aviso'); el.textContent=txt; el.style.color=cor||'#e6edf7';
+  el.style.opacity=1; clearTimeout(el._t);
+  el._t=setTimeout(()=>el.style.opacity=0,1600);
+}
+
+/* ---------- 8. AUDIO (sintetizado, sem arquivos) ---------- */
+let AC=null;
+function som(f,dur,tipo,vol){
+  if(mudo) return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type=tipo||'square'; o.frequency.setValueAtTime(f,AC.currentTime);
+    g.gain.setValueAtTime(vol||.05,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+dur);
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime+dur);
+  }catch(e){}
+}
+function somDecolagem(){
+  if(mudo) return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type='square'; o.frequency.setValueAtTime(400,AC.currentTime);
+    o.frequency.exponentialRampToValueAtTime(2400,AC.currentTime+.25);
+    g.gain.setValueAtTime(.04,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+.25);
+    o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime+.25);
+  }catch(e){}
+}
+
+
+/* ---------- 12. CAMINHO E CENARIO DO MAPA ---------- */
+function montarCaminho(m){
+  SEG=[]; TOTAL=0;
+  for(let i=0;i<m.caminho.length-1;i++){
+    const a=m.caminho[i], b=m.caminho[i+1];
+    const dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy);
+    SEG.push({x:a[0],y:a[1],dx:dx/L,dy:dy/L,L,d0:TOTAL}); TOTAL+=L;
+  }
+}
+/* inimigo guarda so `d`; isso torna mira primeiro/ultimo trivial */
+function posEm(d){
+  if(d<0)d=0;
+  for(let i=0;i<SEG.length;i++){const s=SEG[i];
+    if(d<=s.d0+s.L||i===SEG.length-1){const t=d-s.d0;
+      return {x:s.x+s.dx*t,y:s.y+s.dy*t,dx:s.dx,dy:s.dy};}}
+}
+function distCaminho(x,y){
+  let m=1e9;
+  for(const s of SEG){
+    let t=(x-s.x)*s.dx+(y-s.y)*s.dy; t=clamp(t,0,s.L);
+    const dd=Math.hypot(x-(s.x+s.dx*t), y-(s.y+s.dy*t));
+    if(dd<m)m=dd;
+  }
+  return m;
+}
+function pintarFundo(m){
+  const C=document.createElement('canvas'); C.width=LARG; C.height=ALT;
+  const g=C.getContext('2d'); g.imageSmoothingEnabled=false;
+  const k=m.cor;
+  g.fillStyle=k.solo; g.fillRect(0,0,LARG,ALT);
+  let sd=12345; const rnd=()=>(sd=(sd*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  for(let i=0;i<900;i++){
+    const x=rnd()*LARG, y=rnd()*ALT, r=6+rnd()*26;
+    g.fillStyle=rnd()>.5?k.s2:k.s3;
+    g.beginPath(); g.arc(x,y,r,0,6.283); g.fill();
+  }
+  for(let i=0;i<1600;i++){
+    g.fillStyle=rnd()>.5?k.g1:k.g2;
+    g.fillRect(Math.floor(rnd()*LARG),Math.floor(rnd()*ALT),2,3);
+  }
+  const tracar=(w,cor)=>{
+    g.strokeStyle=cor; g.lineWidth=w; g.lineJoin='round'; g.lineCap='round';
+    g.beginPath(); g.moveTo(m.caminho[0][0],m.caminho[0][1]);
+    for(let i=1;i<m.caminho.length;i++) g.lineTo(m.caminho[i][0],m.caminho[i][1]);
+    g.stroke();
+  };
+  tracar(42,k.c1); tracar(36,k.c2); tracar(30,k.c3);
+  for(let i=0;i<700;i++){
+    const d=rnd()*TOTAL, p=posEm(d), off=(rnd()-.5)*26;
+    g.fillStyle=rnd()>.5?k.p1:k.p2;
+    g.fillRect(Math.floor(p.x-p.dy*off),Math.floor(p.y+p.dx*off),2,2);
+  }
+  for(const [nome,x,y] of m.decor){
+    const s=SPR[nome];
+    g.fillStyle='rgba(0,0,0,.18)';
+    g.beginPath(); g.ellipse(x,y+s.height/2-4,s.width*.34,5,0,0,6.283); g.fill();
+    g.drawImage(s,Math.round(x-s.width/2),Math.round(y-s.height/2));
+  }
+  const c=SPR.centro, [cx,cy]=m.centro;
+  g.fillStyle='rgba(0,0,0,.2)';
+  g.beginPath(); g.ellipse(cx,cy+c.height/2-4,c.width*.4,7,0,0,6.283); g.fill();
+  g.drawImage(c,Math.round(cx-c.width/2),Math.round(cy-c.height/2));
+  const p0=m.caminho[0];
+  g.fillStyle='rgba(255,255,255,.28)';
+  g.beginPath();
+  if(p0[1]<0){ g.moveTo(p0[0]-14,10); g.lineTo(p0[0],32); g.lineTo(p0[0]+14,10); }
+  else { g.moveTo(8,p0[1]-14); g.lineTo(30,p0[1]); g.lineTo(8,p0[1]+14); }
+  g.fill();
+  const vg=g.createRadialGradient(LARG/2,ALT/2,ALT*.42,LARG/2,ALT/2,ALT*.95);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.45)');
+  g.fillStyle=vg; g.fillRect(0,0,LARG,ALT);
+  return C;
+}
+
+/* ---------- 13. PARTIDA ---------- */
+function iniciarPartida(){
+  mapa=MAPAS[mapaEscolhido];
+  montarCaminho(mapa); FUNDO=pintarFundo(mapa);
+  dinheiro=TESTE?999999:mapa.dinIni; roubados=0; ROUBO_MAX=mapa.roubomax;
+  rodada=0; pops=0; bolasGanhas=0; esperaAuto=3;
+  xpPartida={}; poGanho=0; fichasGanhas=0;
+  emOnda=false; pausado=false; fim=false; jogando=true; velocidade=1;
+  inimigos=[]; torres=[]; projeteis=[]; particulas=[]; raios=[]; flutuantes=[]; socos=[];
+  fila=[]; sel=null; comprando=null;
+  $('tela').classList.remove('ver');
+  $('bVel').textContent='▸ 1x'; $('bVel').classList.remove('on');
+  $('cAuto').checked=autoRodada;
+  $('jMapa').textContent=mapa.nome;
+  $('hTot').textContent=RODADAS[mapa.id].length;
+  irPara('tJogo');
+  montarLoja(); atualizarUI();
+}
+function criarInimigo(tipo,d0){
+  const def=INIMIGOS[tipo], p=posEm(d0);
+  const hp=Math.round(def.hp*(def.chefe?1:mapa.hpMult));
+  inimigos.push({id:idSeq++,tipo,def,hp,hpMax:hp,d:d0,x:p.x,y:p.y,
+    lentoM:1,lentoT:0,bob:Math.random()*6.28,brilho:0});
+}
+function iniciarRodada(){
+  if(emOnda||fim||!jogando) return;
+  rodada++;
+  fila=[];
+  for(const g of RODADAS[mapa.id][rodada-1])
+    for(let i=0;i<g.n;i++) fila.push({t:g.t,q:(g.e||0)+i*g.g});
+  fila.sort((a,b)=>a.q-b.q);
+  tOnda=0; emOnda=true;
+  const ult=rodada===RODADAS[mapa.id].length;
+  if(ult) avisar('PREPARE-SE PARA ENCRENCA!','#ff7d75');
+  else avisar('Rodada '+rodada,'#7fb4ff');
+  som(520,.08,'square',.05);
+  atualizarUI();
+}
+function fimRodada(){
+  emOnda=false; esperaAuto=2.5;
+  const bonus=100+rodada*18;
+  dinheiro+=bonus;
+  if(!TESTE){ bolasGanhas+=mapa.bolasRod; if(rodada%5===0) fichasGanhas++; }
+  flutuar(LARG/2,90,'+'+bonus,'#ffcb05',1.4);
+  som(660,.09,'triangle',.05); setTimeout(()=>som(880,.12,'triangle',.05),90);
+  if(rodada>=RODADAS[mapa.id].length){ vitoria(); return; }
+  atualizarUI();
+}
+function aplicarDano(e,dano,ataque,torre){
+  const m = ataque ? efic(ataque,e.def.tipos) : 1;
+  if(m===0){ if(Math.random()<.05) flutuar(e.x,e.y-18,'IMUNE','#8b9ab4',.7); return; }
+  const resist = (torre&&torre.s.ignoraResist) ? 1 : (e.def.resist||1);
+  let d=dano;
+  if(torre){
+    if(torre.s.mult) d*=torre.s.mult;
+    if(torre.s.antiChefe&&e.def.chefe) d*=torre.s.antiChefe;
+  }
+  e.hp -= d*m*resist;
+  e.brilho=.12;
+  if(m>=2 && Math.random()<.10) flutuar(e.x,e.y-18,(m>=4?'x4!':'x2'),'#ffcb05',.6);
+  else if(m<1 && Math.random()<.05) flutuar(e.x,e.y-18,'x'+m,'#8b9ab4',.6);
+  if(e.hp<=0 && !e.morto) derrotar(e,torre);
+}
+function derrotar(e,torre){
+  e.morto=true; pops++;
+  dinheiro+=e.def.rec;
+  if(torre) xpPartida[torre.k]=(xpPartida[torre.k]||0)+e.def.rec;
+  decolar(e.x,e.y,e.def.chefe?2.4:1);
+  if(e.def.chefe){ flutuar(e.x,e.y-30,'A EQUIPE ROCKET DECOLOU DE NOVO!','#ffcb05',2.4); somDecolagem(); poGanho+=2; }
+  else som(700+Math.random()*260,.07,'square',.03);
+  if(e.def.filhos) e.def.filhos.forEach((f,i)=>criarInimigo(f,Math.max(0,e.d-i*11)));
+}
+function vazar(e){
+  e.morto=true;
+  roubados+=e.def.roubo;
+  const c=mapa.centro;
+  flutuar(c[0],c[1]+34,'-'+e.def.roubo,'#ff7d75',1.2);
+  som(150,.22,'sawtooth',.05);
+  if(roubados>=ROUBO_MAX) derrota();
+}
+function escolherAlvo(t){
+  let melhor=null, val=-Infinity;
+  for(const e of inimigos){
+    if(e.morto) continue;
+    if(e.def.camu && !t.s.detecta) continue;
+    const dd=dist(t.x,t.y,e.x,e.y);
+    if(dd>t.s.alcance) continue;
+    if(efic(t.s.ataque,e.def.tipos)===0) continue;
+    let v;
+    if(t.mira==='primeiro') v=e.d;
+    else if(t.mira==='ultimo') v=-e.d;
+    else if(t.mira==='forte') v=e.hp;
+    else v=-dd;
+    if(v>val){ val=v; melhor=e; }
+  }
+  return melhor;
+}
+function atualizarTorre(t,dt){
+  t.recarga-=dt;
+  if(t.flash>0) t.flash-=dt;
+  const alvo=escolherAlvo(t);
+  if(!alvo) return;
+  t.ang=Math.atan2(alvo.y-t.y,alvo.x-t.x);
+  if(t.recarga>0) return;
+  t.recarga=t.s.cad; t.flash=.12;
+  if(t.s.proj==='raio') dispararRaio(t,alvo);
+  else if(t.s.proj==='soco') socar(t);
+  else dispararProjetil(t,alvo);
+}
+function dispararProjetil(t,alvo){
+  const a=Math.atan2(alvo.y-t.y,alvo.x-t.x);
+  projeteis.push({x:t.x,y:t.y,vx:Math.cos(a)*t.s.velproj,vy:Math.sin(a)*t.s.velproj,
+    dano:t.s.dano,pierce:t.s.pierce,vida:1.8,tipo:t.s.proj,ataque:t.s.ataque,ang:a,
+    area:t.s.area||0,lento:t.s.lento,lentoT:t.s.lentoT,detecta:!!t.s.detecta,torre:t,hits:new Set(),
+    r:t.s.proj==='vinha'?9:t.s.proj==='psi'?12:7});
+  som(t.s.proj==='vinha'?300:t.s.proj==='psi'?620:480,.04,'square',.016);
+}
+function socar(t){
+  let n=0;
+  const alcance=t.s.alcance;
+  for(const e of inimigos){
+    if(e.morto||n>=t.s.pierce) continue;
+    if(e.def.camu&&!t.s.detecta) continue;
+    if(dist(t.x,t.y,e.x,e.y)>alcance) continue;
+    aplicarDano(e,t.s.dano,t.s.ataque,t); n++;
+    faisca(e.x,e.y,'soco');
+  }
+  if(n){ socos.push({x:t.x,y:t.y,r:alcance,t:.16}); som(200,.06,'square',.03); }
+}
+function dispararRaio(t,alvo){
+  const pts=[[t.x,t.y]], atingidos=[alvo];
+  let atual=alvo;
+  for(let i=1;i<t.s.saltos;i++){
+    let prox=null,md=t.s.saltoR;
+    for(const e of inimigos){
+      if(e.morto||atingidos.includes(e)) continue;
+      if(e.def.camu&&!t.s.detecta) continue;
+      if(efic(t.s.ataque,e.def.tipos)===0) continue;
+      const dd=dist(atual.x,atual.y,e.x,e.y);
+      if(dd<md){ md=dd; prox=e; }
+    }
+    if(!prox) break;
+    atingidos.push(prox); atual=prox;
+  }
+  for(const e of atingidos){ pts.push([e.x,e.y]); aplicarDano(e,t.s.dano,t.s.ataque,t); }
+  raios.push({pts,t:.18});
+  som(880,.06,'square',.03);
+}
+function explodir(p){
+  for(const e of inimigos){
+    if(e.morto||p.hits.has(e.id)) continue;
+    if(e.def.camu&&!p.detecta) continue;
+    if(dist(p.x,p.y,e.x,e.y)<=p.area+e.def.raio){
+      p.hits.add(e.id); aplicarDano(e,p.dano,p.ataque,p.torre);
+    }
+  }
+  particulas.push({tipo:'anel',x:p.x,y:p.y,vx:0,vy:0,g:0,t:.26,max:.26,r:p.area*.5,cor:'#8fd0ec'});
+}
+
+function atualizar(dt){
+  if(emOnda){
+    tOnda+=dt;
+    while(fila.length&&fila[0].q<=tOnda) criarInimigo(fila.shift().t,0);
+  }
+  for(const e of inimigos){
+    if(e.morto) continue;
+    if(e.brilho>0) e.brilho-=dt;
+    if(e.lentoT>0){ e.lentoT-=dt; if(e.lentoT<=0) e.lentoM=1; }
+    e.d+=e.def.vel*e.lentoM*dt;
+    if(e.d>=TOTAL){ vazar(e); continue; }
+    const p=posEm(e.d); e.x=p.x; e.y=p.y; e.dx=p.dx; e.dy=p.dy;
+    if(e.def.voa){ e.bob+=dt*4; e.y-=6+Math.sin(e.bob)*3; }
+  }
+  for(const t of torres) atualizarTorre(t,dt);
+  for(const p of projeteis){
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.vida-=dt;
+    if(p.x<-40||p.x>LARG+40||p.y<-40||p.y>ALT+40) p.vida=0;
+    for(const e of inimigos){
+      if(e.morto||p.pierce<=0||p.hits.has(e.id)) continue;
+      if(e.def.camu&&!p.detecta) continue;
+      if(dist(p.x,p.y,e.x,e.y)<e.def.raio+p.r){
+        if(p.area){ p.pierce=0; explodir(p); p.vida=0; break; }
+        p.hits.add(e.id); p.pierce--;
+        aplicarDano(e,p.dano,p.ataque,p.torre);
+        if(p.lento&&e.lentoM>p.lento){ e.lentoM=p.lento; e.lentoT=p.lentoT; }
+        faisca(p.x,p.y,p.tipo);
+        if(p.pierce<=0) p.vida=0;
+      }
+    }
+  }
+  for(const q of particulas){ q.t-=dt; q.x+=q.vx*dt; q.y+=q.vy*dt; q.vy+=q.g*dt; q.vx*=.99; }
+  for(const r of raios) r.t-=dt;
+  for(const s of socos) s.t-=dt;
+  for(const f of flutuantes){ f.t-=dt; f.y-=22*dt; }
+  if(!emOnda&&autoRodada&&!fim&&jogando&&rodada<RODADAS[mapa.id].length){
+    esperaAuto-=dt;
+    if(esperaAuto<=0) iniciarRodada();
+  }
+  inimigos=inimigos.filter(e=>!e.morto);
+  projeteis=projeteis.filter(p=>p.vida>0);
+  particulas=particulas.filter(q=>q.t>0);
+  raios=raios.filter(r=>r.t>0);
+  socos=socos.filter(s=>s.t>0);
+  flutuantes=flutuantes.filter(f=>f.t>0);
+  if(emOnda&&!fila.length&&!inimigos.length) fimRodada();
+}
+
+/* ---------- 14. RENDER ---------- */
+function circuloAlcance(x,y,r,cor){
+  G.save();
+  G.beginPath(); G.arc(x,y,r,0,6.283);
+  G.fillStyle=cor+'20'; G.fill();
+  G.strokeStyle=cor+'cc'; G.lineWidth=2; G.setLineDash([7,6]); G.stroke();
+  G.restore();
+}
+function sprite(k,x,y,virar,esc,shiny){
+  const s=shiny?sprDe(k,true):SPR[k], w=s.width*(esc||1), h=s.height*(esc||1);
+  G.save(); G.translate(Math.round(x),Math.round(y));
+  if(virar) G.scale(-1,1);
+  G.drawImage(s,-Math.round(w/2),-Math.round(h/2),w,h);
+  G.restore();
+}
+function sombra(x,y,rx){
+  G.fillStyle='rgba(0,0,0,.22)';
+  G.beginPath(); G.ellipse(x,y,rx,rx*.34,0,0,6.283); G.fill();
+}
+
+function desenhar(){
+  if(!FUNDO){ G.fillStyle='#0a0e14'; G.fillRect(0,0,LARG,ALT); return; }
+  G.drawImage(FUNDO,0,0);
+
+  if(sel) circuloAlcance(sel.x,sel.y,sel.s.alcance,'#ffcb05');
+  if(comprando&&mouse.dentro){
+    const ok=posicaoValida(mouse.x,mouse.y);
+    circuloAlcance(mouse.x,mouse.y,POKE[comprando].base.alcance,ok?'#4cc76a':'#e8453c');
+  }
+
+  for(const t of torres){
+    sombra(t.x,t.y+SPR[t.spr].height/2-4,SPR[t.spr].width*.3);
+    sprite(t.spr,t.x,t.y-2,t.ang>1.571||t.ang<-1.571,t.flash>0?1+t.flash*.5:1,t.shiny);
+    if(t.shiny&&Math.random()<.05)
+      particulas.push({tipo:'brilho',x:t.x+(Math.random()-.5)*26,y:t.y+(Math.random()-.5)*26,
+        vx:0,vy:-24,g:0,t:.5,max:.5,r:2.5,cor:'#ffe066'});
+  }
+
+  const ord=inimigos.slice().sort((a,b)=>a.d-b.d);
+  for(const e of ord){
+    const s=SPR[e.def.spr];
+    if(!e.def.voa) sombra(e.x,e.y+s.height/2-3,s.width*.3);
+    else { G.globalAlpha=.35; sombra(e.x,e.y+22,s.width*.26); G.globalAlpha=1; }
+    if(e.def.camu){
+      G.save();
+      G.strokeStyle='rgba(168,111,214,.75)'; G.lineWidth=2; G.setLineDash([4,4]);
+      G.lineDashOffset=-performance.now()/90;
+      G.beginPath(); G.arc(e.x,e.y,e.def.raio+6,0,6.283); G.stroke();
+      G.restore();
+      G.globalAlpha=.72;
+    }
+    sprite(e.def.spr,e.x,e.y,e.dx<-.1);
+    G.globalAlpha=1;
+    if(e.brilho>0){
+      G.save(); G.globalAlpha=e.brilho*4; G.globalCompositeOperation='lighter';
+      sprite(e.def.spr,e.x,e.y,e.dx<-.1); G.restore();
+    }
+    if(e.lentoT>0){
+      G.fillStyle='rgba(120,220,180,.28)';
+      G.beginPath(); G.arc(e.x,e.y,e.def.raio+3,0,6.283); G.fill();
+    }
+    if(e.hp<e.hpMax){
+      const w=Math.max(20,e.def.raio*2), h=4, x=e.x-w/2, y=e.y-s.height/2-7;
+      G.fillStyle='rgba(0,0,0,.55)'; G.fillRect(x-1,y-1,w+2,h+2);
+      G.fillStyle=e.def.chefe?'#ffcb05':'#4cc76a';
+      G.fillRect(x,y,w*(e.hp/e.hpMax),h);
+    }
+  }
+
+  for(const p of projeteis){
+    if(p.tipo==='vinha'){
+      G.save(); G.translate(p.x,p.y); G.rotate(Math.atan2(p.vy,p.vx));
+      G.fillStyle='#3e8b78'; G.fillRect(-11,-3,22,6);
+      G.fillStyle='#6cc4a6'; G.fillRect(-11,-3,22,3);
+      G.fillStyle='#9ee2c6'; G.fillRect(6,-4,6,8);
+      G.restore();
+    } else if(p.tipo==='bolha'){
+      G.fillStyle='rgba(90,168,216,.85)'; G.beginPath(); G.arc(p.x,p.y,8,0,6.283); G.fill();
+      G.fillStyle='#dff2fa'; G.beginPath(); G.arc(p.x-3,p.y-3,3,0,6.283); G.fill();
+    } else if(p.tipo==='psi'){
+      G.save(); G.globalAlpha=.8;
+      G.strokeStyle='#f85888'; G.lineWidth=3;
+      G.beginPath(); G.ellipse(p.x,p.y,7,13,Math.atan2(p.vy,p.vx),0,6.283); G.stroke();
+      G.strokeStyle='rgba(248,88,136,.4)'; G.lineWidth=6;
+      G.beginPath(); G.ellipse(p.x,p.y,11,18,Math.atan2(p.vy,p.vx),0,6.283); G.stroke();
+      G.restore();
+    } else if(p.tipo==='dragao'){
+      G.fillStyle='#7038f8'; G.beginPath(); G.arc(p.x,p.y,8,0,6.283); G.fill();
+      G.fillStyle='#c0a8f0'; G.beginPath(); G.arc(p.x,p.y,4,0,6.283); G.fill();
+    } else if(p.tipo==='invest'){
+      G.fillStyle='#f5e8d0'; G.beginPath(); G.arc(p.x,p.y,5,0,6.283); G.fill();
+      G.fillStyle='#c08850'; G.beginPath(); G.arc(p.x-p.vx*.006,p.y-p.vy*.006,3,0,6.283); G.fill();
+    } else {
+      G.fillStyle='#ff7a18'; G.beginPath(); G.arc(p.x,p.y,6,0,6.283); G.fill();
+      G.fillStyle='#ffe066'; G.beginPath(); G.arc(p.x-p.vx*.006,p.y-p.vy*.006,3.5,0,6.283); G.fill();
+    }
+  }
+
+  for(const s of socos){
+    const a=s.t/.16;
+    G.save(); G.globalAlpha=a*.8;
+    G.strokeStyle='#a5cccc'; G.lineWidth=4;
+    G.beginPath(); G.arc(s.x,s.y,s.r*(1.05-a*.25),0,6.283); G.stroke();
+    G.restore();
+  }
+
+  for(const r of raios){
+    const a=r.t/.18;
+    G.save(); G.globalAlpha=a; G.lineCap='round'; G.lineJoin='round';
+    for(let cam=0;cam<2;cam++){
+      G.strokeStyle=cam?'#ffffff':'#ffe066'; G.lineWidth=cam?2:6;
+      G.beginPath();
+      for(let i=0;i<r.pts.length-1;i++){
+        const [x1,y1]=r.pts[i], [x2,y2]=r.pts[i+1];
+        G.moveTo(x1,y1);
+        G.lineTo((x1+x2)/2+(Math.random()-.5)*14,(y1+y2)/2+(Math.random()-.5)*14);
+        G.lineTo(x2,y2);
+      }
+      G.stroke();
+    }
+    G.restore();
+  }
+
+  for(const q of particulas){
+    const a=clamp(q.t/q.max,0,1);
+    if(q.tipo==='estrela'){
+      G.save(); G.translate(q.x,q.y); G.rotate((1-a)*6); G.globalAlpha=a;
+      G.fillStyle='#ffffff';
+      const r=q.r*(.5+a*.8);
+      G.beginPath();
+      for(let i=0;i<4;i++){ const ang=i*1.5708;
+        G.moveTo(0,0);
+        G.lineTo(Math.cos(ang-.25)*r*.4,Math.sin(ang-.25)*r*.4);
+        G.lineTo(Math.cos(ang)*r*2.4,Math.sin(ang)*r*2.4);
+        G.lineTo(Math.cos(ang+.25)*r*.4,Math.sin(ang+.25)*r*.4);
+      }
+      G.fill();
+      G.fillStyle='#ffe066'; G.beginPath(); G.arc(0,0,r*.5,0,6.283); G.fill();
+      G.restore();
+    } else if(q.tipo==='anel'){
+      G.save(); G.globalAlpha=a*.8;
+      G.strokeStyle=q.cor||'#ffffff'; G.lineWidth=3;
+      G.beginPath(); G.arc(q.x,q.y,q.r+(1-a)*26,0,6.283); G.stroke();
+      G.restore();
+    } else {
+      G.save(); G.globalAlpha=a;
+      G.fillStyle=q.cor||'#ffe066';
+      G.fillRect(q.x-q.r/2,q.y-q.r/2,q.r,q.r);
+      G.restore();
+    }
+  }
+
+  G.textAlign='center';
+  for(const f of flutuantes){
+    const a=clamp(f.t/f.max,0,1);
+    G.save(); G.globalAlpha=a;
+    G.font='800 '+(f.txt.length>12?15:20)+'px "Segoe UI",sans-serif';
+    G.lineWidth=4; G.strokeStyle='rgba(0,0,0,.75)';
+    G.strokeText(f.txt,f.x,f.y); G.fillStyle=f.cor; G.fillText(f.txt,f.x,f.y);
+    G.restore();
+  }
+  G.textAlign='left';
+
+  if(comprando&&mouse.dentro){
+    const ok=posicaoValida(mouse.x,mouse.y);
+    G.globalAlpha=.7;
+    sprite(POKE[comprando].spr,mouse.x,mouse.y-2,false);
+    G.globalAlpha=1;
+    if(!ok){
+      G.strokeStyle='#e8453c'; G.lineWidth=4; G.lineCap='round';
+      G.beginPath(); G.moveTo(mouse.x-13,mouse.y-13); G.lineTo(mouse.x+13,mouse.y+13);
+      G.moveTo(mouse.x+13,mouse.y-13); G.lineTo(mouse.x-13,mouse.y+13); G.stroke();
+    }
+  }
+
+  if(pausado&&!fim){
+    G.fillStyle='rgba(6,9,14,.5)'; G.fillRect(0,0,LARG,ALT);
+    G.fillStyle='#fff'; G.font='800 34px "Segoe UI",sans-serif'; G.textAlign='center';
+    G.fillText('PAUSADO',LARG/2,ALT/2); G.textAlign='left';
+  }
+}
+
+/* ---------- 15. COLOCACAO ---------- */
+function posicaoValida(x,y){
+  if(x<24||x>LARG-24||y<24||y>ALT-24) return false;
+  if(distCaminho(x,y)<32) return false;
+  if(dist(x,y,mapa.centro[0],mapa.centro[1])<50) return false;
+  for(const t of torres) if(dist(x,y,t.x,t.y)<34) return false;
+  return true;
+}
+function colocar(k,x,y){
+  const def=POKE[k], s=Object.assign({},def.base);
+  aplicarArvore(k,s);
+  const c=custoDe(k);
+  torres.push({k,def,x,y,s,spr:def.spr,shiny:!!SAVE.shiny[k],
+    mira:'primeiro',recarga:0,flash:0,ang:0,nivel:0,gasto:c});
+  dinheiro-=c;
+  som(560,.07,'triangle',.05);
+  for(let i=0;i<8;i++){const a=Math.random()*6.283;
+    particulas.push({tipo:'brilho',x,y,vx:Math.cos(a)*70,vy:Math.sin(a)*70,g:200,t:.3,max:.3,r:3,cor:'#ffffff'});}
+}
+function aplicarUp(t,up){
+  const c=custoUp(t.k,up);
+  if(dinheiro<c) return;
+  if(up.final&&temFinalEmCampo(up.evo)){
+    avisar('So pode existir um '+up.n+' em campo','#ff7d75');
+    som(180,.08,'square',.03); return;
+  }
+  dinheiro-=c; t.gasto+=c;
+  up.f(t.s);
+  if(up.evo){
+    t.spr=up.evo;
+    avisar('O que? '+(t.nome||t.def.nome)+' esta evoluindo!','#a86fd6');
+    t.nome=up.n;
+    decolar(t.x,t.y,1.4);
+    som(660,.1,'triangle',.05);
+    setTimeout(()=>som(880,.1,'triangle',.05),110);
+    setTimeout(()=>som(1100,.2,'triangle',.05),220);
+  } else som(740,.08,'triangle',.045);
+  t.nivel++;
+  atualizarUI();
+}
+function comprarUpgrade(t){
+  const up=t.def.ups[t.nivel];
+  if(!up||up.ramo) return;
+  aplicarUp(t,up);
+}
+function vender(t){
+  dinheiro+=Math.floor(t.gasto*.7);
+  torres=torres.filter(x=>x!==t);
+  sel=null; som(280,.1,'triangle',.04); atualizarUI();
+}
+
+/* ---------- 16. UI DA PARTIDA ---------- */
+function montarLoja(){
+  const el=$('loja'); el.innerHTML='';
+  equipe.forEach((k,i)=>{
+    const d=POKE[k];
+    const c=document.createElement('div');
+    c.className='card'; c.dataset.k=k;
+    c.innerHTML='<img src="'+urlSpr(d.spr)+'">'+
+      '<div><div class="n">'+d.nome+' <span class="tec">'+(i+1)+'</span></div>'+
+      '<div class="d">'+d.desc+'</div></div>'+
+      '<div class="c">'+custoDe(k)+'</div>';
+    c.onclick=()=>{ if(dinheiro<custoDe(k)) return; comprando=(comprando===k?null:k); sel=null; atualizarUI(); };
+    el.appendChild(c);
+  });
+}
+function atualizarHUD(){
+  $('hDin').textContent=dinheiro;
+  $('hVid').textContent=roubados+'/'+ROUBO_MAX;
+  $('hRod').textContent=rodada;
+  $('hPop').textContent=pops;
+  $('hBol').textContent=bolasGanhas;
+  $('hUnid').textContent=torres.length;
+  $('hUnidMax').textContent=limiteUnid();
+  $('hUnidBox').classList.toggle('vermelho',torres.length>=limiteUnid());
+  $('hTeste').style.display=TESTE?'':'none';
+  const cheio=torres.length>=limiteUnid();
+  for(const c of document.querySelectorAll('#loja .card')){
+    const k=c.dataset.k;
+    c.classList.toggle('pobre',cheio||dinheiro<custoDe(k));
+    c.classList.toggle('sel',comprando===k);
+  }
+  for(const el of document.querySelectorAll('.up[data-c]'))
+    el.classList.toggle('pobre',dinheiro<+el.dataset.c);
+  const b=$('bOnda');
+  b.disabled=emOnda||fim;
+  const rot=fim?'—':(emOnda?'Rodada '+rodada+' em andamento':'▶ Iniciar Rodada '+(rodada+1));
+  if(b.textContent!==rot) b.textContent=rot;
+}
+function atualizarUI(){
+  atualizarHUD();
+  const pv=$('prev'); pv.innerHTML='';
+  const prox=RODADAS[mapa.id][rodada];
+  if(prox){
+    const cont={};
+    for(const g of prox) cont[g.t]=(cont[g.t]||0)+g.n;
+    for(const t in cont){
+      const D=INIMIGOS[t];
+      const d=document.createElement('div'); d.className='p'+(D.camu?' camu':'');
+      d.title=D.nome+' — '+D.tipos.map(x=>TIPOS[x].n).join('/')+(D.camu?' (camuflado)':'');
+      d.innerHTML='<img src="'+urlSpr(D.spr)+'"><b>x'+cont[t]+'</b>';
+      pv.appendChild(d);
+    }
+  } else pv.innerHTML='<b style="color:#8b9ab4;font-size:11px">Mapa limpo.</b>';
+
+  $('cxTorre').style.display=sel?'block':'none';
+  $('cxLoja').style.display=sel?'none':'block';
+  if(!sel) return;
+  $('tnome').innerHTML=(sel.nome||sel.def.nome)+' '+chip(sel.s.ataque)+(sel.s.detecta?'<span class="chip faro">FARO</span>':'');
+  const u=$('ups'); u.innerHTML='';
+  const st=document.createElement('div');
+  st.className='up feito'; st.style.cursor='default';
+  st.innerHTML='<div class="d" style="color:#9fb0cc">Dano <b>'+sel.s.dano+'</b> · Alcance <b>'+
+    Math.round(sel.s.alcance)+'</b> · <b>'+(1/sel.s.cad).toFixed(1)+'</b>/s'+
+    (sel.s.pierce>1?' · Penetra <b>'+sel.s.pierce+'</b>':'')+
+    (sel.s.saltos?' · <b>'+sel.s.saltos+'</b> saltos':'')+
+    (sel.s.area?' · Area <b>'+sel.s.area+'</b>':'')+
+    (sel.s.lento?' · Lentidao <b>'+Math.round((1-sel.s.lento)*100)+'%</b>':'')+'</div>';
+  u.appendChild(st);
+  sel.def.ups.forEach((up,i)=>{
+    const feito=i<sel.nivel, disp=i===sel.nivel;
+    if(!disp&&!feito) return;
+    if(up.ramo && disp){
+      const cab=document.createElement('div');
+      cab.className='up feito'; cab.style.cursor='default';
+      cab.innerHTML='<div class="l"><span class="n" style="color:#a86fd6">'+up.n+'</span></div><div class="d">'+up.d+'</div>';
+      u.appendChild(cab);
+      for(const r of up.ramo){
+        const d=document.createElement('div');
+        const bloq=r.final&&temFinalEmCampo(r.evo);
+        d.className='up evo ramo'+(bloq?' bloq':'');
+        if(!bloq) d.dataset.c=custoUp(sel.k,r);
+        d.innerHTML='<div class="l"><img src="'+urlSpr(r.evo)+'"><span class="n">'+r.n+'</span>'+
+          '<span class="c">'+(bloq?'✖':custoUp(sel.k,r))+'</span></div><div class="d">'+
+          (bloq?'Ja existe um '+r.n+' em campo. So pode um.':r.d)+'</div>';
+        if(!bloq) d.onclick=()=>aplicarUp(sel,r);
+        u.appendChild(d);
+      }
+      return;
+    }
+    const d=document.createElement('div');
+    const bloq=disp&&up.final&&temFinalEmCampo(up.evo);
+    d.className='up'+(feito?' feito':'')+(up.evo?' evo':'')+(bloq?' bloq':'');
+    if(disp&&!bloq) d.dataset.c=custoUp(sel.k,up);
+    d.innerHTML='<div class="l"><span class="n">'+up.n+'</span>'+
+      (feito?'<span class="c" style="color:#4cc76a">✓</span>'
+           :'<span class="c">'+(bloq?'✖':custoUp(sel.k,up))+'</span>')+
+      '</div><div class="d">'+(bloq?'Ja existe um '+up.n+' em campo. So pode um.':up.d)+'</div>';
+    if(disp&&!bloq) d.onclick=()=>comprarUpgrade(sel);
+    u.appendChild(d);
+  });
+  if(sel.nivel>=sel.def.ups.length){
+    const d=document.createElement('div'); d.className='up feito';
+    d.innerHTML='<div class="l"><span class="n">Forma final</span></div><div class="d">Nao ha mais o que treinar.</div>';
+    u.appendChild(d);
+  }
+  const m=$('mira'); m.innerHTML='';
+  for(const [v,lab] of MIRAS){
+    const bt=document.createElement('button');
+    bt.className='btn'+(sel.mira===v?' on':''); bt.textContent=lab;
+    bt.onclick=()=>{sel.mira=v; atualizarUI();};
+    m.appendChild(bt);
+  }
+  $('vender').textContent='Liberar (+'+Math.floor(sel.gasto*.7)+')';
+  $('vender').onclick=()=>vender(sel);
+}
+
+/* ---------- 17. FIM DE PARTIDA ---------- */
+function telaFim(tit,txt,cor){
+  fim=true; emOnda=false;
+  $('tTit').textContent=tit; $('tTit').style.color=cor;
+  $('tTxt').innerHTML=txt;
+  $('tela').classList.add('ver');
+  atualizarUI();
+}
+function comitarGanhos(){
+  if(TESTE) return;
+  for(const k in xpPartida){
+    const b=temNo(k,'xp')?1.3:1;
+    SAVE.xp[k]=(SAVE.xp[k]||0)+Math.round(xpPartida[k]*b);
+  }
+  SAVE.po+=poGanho; SAVE.fichas+=fichasGanhas;
+}
+function resumoGanhos(){
+  if(TESTE) return '';
+  const xs=Object.keys(xpPartida).map(k=>POKE[k].nome+' +'+Math.round(xpPartida[k]*(temNo(k,'xp')?1.3:1))+' XP');
+  let s='';
+  if(xs.length) s+='<br><span style="font-size:12px">'+xs.join(' · ')+'</span>';
+  if(poGanho||fichasGanhas)
+    s+='<br><span style="font-size:12px;color:#ffcb05">+'+poGanho+' po de estrela · +'+fichasGanhas+' fichas</span>';
+  return s;
+}
+function derrota(){
+  if(!TESTE){ SAVE.bolas+=bolasGanhas; comitarGanhos(); salvar(); }
+  telaFim('A ROTA CAIU',
+    'A Equipe Rocket levou '+roubados+' Pokemon. Voce aguentou ate a rodada '+rodada+'.<br><br>'+
+    'Mesmo assim voce recolheu '+bolaHTML(bolasGanhas)+' no caminho.'+resumoGanhos(),'#ff7d75');
+  som(200,.5,'sawtooth',.06);
+}
+function vitoria(){
+  const primeira=!SAVE.feitos[mapa.id];
+  const b=Math.round(primeira?mapa.bolasFim:mapa.bolasFim*.4);
+  if(!TESTE){
+    bolasGanhas+=b;
+    fichasGanhas+=3; if(primeira) poGanho+=5;
+    SAVE.feitos[mapa.id]=true;
+    SAVE.bolas+=bolasGanhas;
+    const rec=SAVE.recordes[mapa.id]||0;
+    if(pops>rec) SAVE.recordes[mapa.id]=pops;
+    comitarGanhos();
+    salvar();
+  }
+  const prox=MAPAS[mapaEscolhido+1];
+  telaFim(mapa.nome.toUpperCase()+' LIMPO!',
+    TESTE ? 'Voce fez <b>'+pops+'</b> Rocket decolarem.<br><br><span style="color:#ff9a92">Modo teste: nada disso foi salvo.</span>'
+    : 'Voce fez <b>'+pops+'</b> Rocket decolarem.<br>'+
+    (primeira?'Primeira limpeza: ':'Repetido: ')+'<b>'+b+'</b> pokebolas de bonus.<br><br>'+
+    'Total da partida: '+bolaHTML(bolasGanhas)+resumoGanhos()+
+    (primeira&&prox?'<br><br><span style="color:#4cc76a">Novo mapa liberado: '+prox.nome+'</span>':''),
+    '#ffcb05');
+  somDecolagem();
+}
+function sairPartida(){
+  jogando=false; fim=true; FUNDO=null;
+  $('tela').classList.remove('ver');
+  irPara('tMenu');
+}
+
+/* ---------- 18. INPUT ---------- */
+function coords(ev){
+  const r=CV.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)*(LARG/r.width), y:(ev.clientY-r.top)*(ALT/r.height)};
+}
+CV.addEventListener('mousemove',ev=>{const c=coords(ev); mouse.x=c.x; mouse.y=c.y; mouse.dentro=true;});
+CV.addEventListener('mouseleave',()=>mouse.dentro=false);
+CV.addEventListener('contextmenu',ev=>{ev.preventDefault(); comprando=null; sel=null; atualizarUI();});
+CV.addEventListener('click',ev=>{
+  if(fim||!jogando) return;
+  const c=coords(ev);
+  if(comprando){
+    const d=POKE[comprando];
+    if(torres.length>=limiteUnid()){
+      avisar('Limite de '+limiteUnid()+' unidades neste mapa','#ff7d75');
+      som(180,.08,'square',.03);
+    } else if(dinheiro>=custoDe(comprando)&&posicaoValida(c.x,c.y)){
+      colocar(comprando,c.x,c.y);
+      if(dinheiro<custoDe(comprando)) comprando=null;
+    } else som(180,.08,'square',.03);
+    atualizarUI(); return;
+  }
+  let achou=null;
+  for(const t of torres) if(dist(c.x,c.y,t.x,t.y)<26) achou=t;
+  sel=achou; atualizarUI();
+});
+document.addEventListener('keydown',ev=>{
+  if(telaAtual!=='tJogo') return;
+  const k=ev.key;
+  if(k==='Escape'){ comprando=null; sel=null; atualizarUI(); }
+  else if(k>='1'&&k<='6'){
+    const n=equipe[+k-1];
+    if(n&&dinheiro>=custoDe(n)){ comprando=(comprando===n?null:n); sel=null; atualizarUI(); }
+  }
+  else if(k===' '){ ev.preventDefault(); if(!emOnda&&!fim) iniciarRodada(); }
+  else if(k==='p'||k==='P'){ alternarPausa(); }
+});
+function alternarPausa(){
+  pausado=!pausado;
+  $('bPause').textContent=pausado?'▶ Seguir':'‖ Pausa';
+  $('bPause').classList.toggle('on',pausado);
+}
+$('bOnda').onclick=()=>iniciarRodada();
+$('bPause').onclick=alternarPausa;
+$('bVel').onclick=()=>{
+  velocidade=VELOCIDADES[(VELOCIDADES.indexOf(velocidade)+1)%VELOCIDADES.length];
+  $('bVel').textContent='▸ '+velocidade+'x'; $('bVel').classList.toggle('on',velocidade>1); };
+$('cAuto').onchange=e=>{ autoRodada=e.target.checked; esperaAuto=1.5; };
+$('mTeste').onclick=()=>{
+  TESTE=!TESTE;
+  $('mTeste').textContent='Modo teste: '+(TESTE?'ON':'OFF');
+  $('mTeste').classList.toggle('on',TESTE);
+  $('testeInfo').classList.toggle('ver',TESTE);
+  som(TESTE?660:330,.08,'square',.04);
+};
+$('bSom').onclick=()=>{ mudo=!mudo; $('bSom').textContent=mudo?'♪̶':'♪'; $('bSom').classList.toggle('on',!mudo); };
+$('bSair').onclick=sairPartida;
+$('tBtn').onclick=sairPartida;
+$('mJogar').onclick=()=>irPara('tMapa');
+$('mSafari').onclick=()=>irPara('tSafari');
+$('mReset').onclick=()=>{
+  if(!confirm('Isso apaga a colecao, as pokebolas e o progresso dos mapas. Tem certeza?')) return;
+  SAVE=SAVE_VAZIO();
+  salvar(); alvoSafari=null; irPara('tInicial');
+};
+$('sfVoltar').onclick=()=>irPara('tMenu');
+$('mapVoltar').onclick=()=>irPara('tMenu');
+$('eqVoltar').onclick=()=>irPara('tMapa');
+$('eqIr').onclick=()=>{ SAVE.equipe=equipe; salvar(); iniciarPartida(); };
+$('sf1').onclick=()=>atirar(alvoSafari,1);
+$('sf10').onclick=()=>atirar(alvoSafari,10);
+$('mTreino').onclick=()=>irPara('tTreino');
+$('mCassino').onclick=()=>irPara('tCassino');
+$('trVoltar').onclick=()=>irPara('tMenu');
+$('arVoltar').onclick=()=>irPara('tTreino');
+$('csVoltar').onclick=()=>irPara('tMenu');
+$('sh1').onclick=()=>atirarShiny(arvoreAberta,1);
+$('sh25').onclick=()=>atirarShiny(arvoreAberta,25);
+$('cs1').onclick=()=>atirarTM(1);
+$('cs10').onclick=()=>atirarTM(10);
+
+
+/* ---------- icones das moedas novas ---------- */
+ARTE.poestrela={s:2,p:{'1':'#4a3a1a','2':'#ffd93d','3':'#fff6c0'},r:[
+'....11....','...1221...','...1221...','.11122111.','1223333221',
+'1223333221','.11122111.','...1221...','...1221...','....11....']};
+ARTE.ficha={s:2,p:{'1':'#5a2a1a','2':'#e8453c','3':'#ffd93d'},r:[
+'..111111..','.12222221.','1223333221','1233113321','1233113321',
+'1233331321','1233131321','1223333221','.12222221.','..111111..']};
+SPR.poestrela=montar(ARTE.poestrela.p,ARTE.poestrela.r,ARTE.poestrela.s);
+SPR.ficha=montar(ARTE.ficha.p,ARTE.ficha.r,ARTE.ficha.s);
+
+/* ============================================================
+   FASE 3 — XP e arvore, shiny (Po de Estrela), TM (Ficha do Cassino)
+   ============================================================ */
+
+/* ---------- A. ARVORE DE HABILIDADES ----------
+   Esqueleto igual pra todo mundo + 1 no de assinatura por Pokemon.
+   Paga com o XP daquele Pokemon, que so se ganha jogando com ele.   */
+const ASSINATURA={
+ charmander:{n:'Chama Persistente',d:'+2 de dano e +1 de penetracao.',f:s=>{s.dano+=2;s.pierce+=1;}},
+ bulbasaur: {n:'Esporos',d:'Lentidao 15% mais forte e 0,6s mais longa.',f:s=>{s.lento=(s.lento||1)*.85;s.lentoT=(s.lentoT||1)+.6;}},
+ squirtle:  {n:'Jato Duplo',d:'+40% de area na explosao.',f:s=>{s.area=Math.round((s.area||40)*1.4);}},
+ pikachu:   {n:'Corrente',d:'+2 saltos e +20 de raio de salto.',f:s=>{s.saltos=(s.saltos||3)+2;s.saltoR=(s.saltoR||88)+20;}},
+ machop:    {n:'Guarda Erguida',d:'+35 de alcance. Resolve o drama do corpo a corpo.',f:s=>{s.alcance+=35;}},
+ growlithe: {n:'Intimidar',d:'+2 de dano e +25 de alcance.',f:s=>{s.dano+=2;s.alcance+=25;}},
+ abra:      {n:'Premonicao Total',d:'+4 de penetracao.',f:s=>{s.pierce+=4;}},
+ gastly:    {n:'Maldicao',d:'Ignora a armadura dos Rocket de Elite e dos chefes.',f:s=>{s.ignoraResist=true;}},
+ eevee:     {n:'Adaptacao',d:'+2 de dano em qualquer forma.',f:s=>{s.dano+=2;}},
+ dratini:   {n:'Escamas Antigas',d:'+50% de dano contra chefes.',f:s=>{s.antiChefe=1.5;}}
+};
+const ARVORE=[
+ {id:'alcance', andar:1, c:120,  n:'Visao Ampla',    d:'+12% de alcance.',            f:s=>{s.alcance=Math.round(s.alcance*1.12);}},
+ {id:'dano',    andar:1, c:120,  n:'Treino Pesado',  d:'+1 de dano.',                 f:s=>{s.dano+=1;}},
+ {id:'cadencia',andar:2, c:300,  n:'Reflexo',        d:'Cadencia 12% mais rapida.',   f:s=>{s.cad*=.88;}},
+ {id:'custo',   andar:2, c:300,  n:'Amizade',        d:'12% mais barato pra colocar e evoluir.', f:null},
+ {id:'estouro', andar:3, c:700,  n:'Estouro Melhor', d:'+2 de penetracao e +25% de area.', f:s=>{s.pierce+=2; if(s.area) s.area=Math.round(s.area*1.25);}},
+ {id:'xp',      andar:3, c:700,  n:'Aprendiz',       d:'+30% de XP ganho por este Pokemon.', f:null},
+ {id:'sig',     andar:3, c:700,  n:'ASSINATURA',     d:'', f:null},
+ {id:'idolo',   andar:4, c:1500, n:'Idolo',          d:'Libera este Pokemon no gacha de Po de Estrela (shiny).', f:null, exc:'tm'},
+ {id:'tm',      andar:4, c:1500, n:'Slot de TM',     d:'Permite ensinar uma TM a este Pokemon.', f:null, exc:'idolo'}
+];
+const xpDe   = k=>SAVE.xp[k]||0;
+const temNo  = (k,id)=>!!(SAVE.arvore[k]&&SAVE.arvore[k][id]);
+function andarLiberado(k,andar){
+  if(andar===1) return true;
+  return ARVORE.some(n=>n.andar===andar-1&&temNo(k,n.id));
+}
+function podeComprarNo(k,no){
+  if(temNo(k,no.id)) return false;
+  if(no.exc&&temNo(k,no.exc)) return false;
+  if(!andarLiberado(k,no.andar)) return false;
+  return xpDe(k)>=no.c;
+}
+function comprarNo(k,no){
+  if(!podeComprarNo(k,no)) return;
+  SAVE.xp[k]=xpDe(k)-no.c;
+  SAVE.arvore[k]=SAVE.arvore[k]||{};
+  SAVE.arvore[k][no.id]=true;
+  salvar(); som(740,.08,'triangle',.045); pintarArvore(k);
+}
+function descontoDe(k){ return temNo(k,'custo')?.88:1; }
+const custoDe   = k=>Math.round(POKE[k].custo*descontoDe(k));
+const custoUp   = (k,up)=>Math.round(up.c*descontoDe(k));
+function aplicarArvore(k,s){
+  for(const no of ARVORE){
+    if(!temNo(k,no.id)) continue;
+    if(no.id==='sig'){ const a=ASSINATURA[k]; if(a&&a.f) a.f(s); continue; }
+    if(no.f) no.f(s);
+  }
+  if(temNo(k,'tm')&&SAVE.tmEquip[k]&&TMS[SAVE.tmEquip[k]]) TMS[SAVE.tmEquip[k]].f(s);
+  if(SAVE.shiny[k]) s.mult=(s.mult||1)*1.1;
+}
+
+/* ---------- B. SHINY ----------
+   Nao existe sprite shiny escrito a mao: a paleta base e girada no matiz,
+   que e exatamente o que o jogo original faz.                          */
+function hexParaHsl(h){
+  const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  let hh=0,ss=0,ll=(mx+mn)/2,d=mx-mn;
+  if(d){ ss=ll>.5?d/(2-mx-mn):d/(mx+mn);
+    hh=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4); hh/=6; }
+  return [hh,ss,ll];
+}
+function hslParaHex(h,s,l){
+  const f=n=>{ const k=(n+h*12)%12, a=s*Math.min(l,1-l);
+    const v=l-a*Math.max(-1,Math.min(k-3,Math.min(9-k,1)));
+    return Math.round(v*255).toString(16).padStart(2,'0'); };
+  return '#'+f(0)+f(8)+f(4);
+}
+function paletaShiny(p){
+  const out={};
+  for(const c in p){
+    const [h,s,l]=hexParaHsl(p[c]);
+    if(s<.12||l<.16||l>.93){ out[c]=p[c]; continue; }  /* contorno, olho e branco ficam */
+    out[c]=hslParaHex((h+.42)%1, Math.min(1,s*1.1), l);
+  }
+  return out;
+}
+const SPR_SHINY={};
+function sprDe(nome,shiny){
+  if(!shiny) return SPR[nome];
+  if(!SPR_SHINY[nome]){
+    const a=ARTE[nome];
+    SPR_SHINY[nome]=montar(paletaShiny(a.p),a.r,a.s);
+  }
+  return SPR_SHINY[nome];
+}
+const CACHE_SH={};
+function urlPoke(k){
+  const sh=!!SAVE.shiny[k], nome=POKE[k].spr, ch=nome+(sh?'-s':'');
+  return CACHE_SH[ch]||(CACHE_SH[ch]=sprDe(nome,sh).toDataURL());
+}
+const CHANCE_SHINY=.012;
+function atirarShiny(k,n){
+  let achou=false,gastos=0;
+  for(let i=0;i<n;i++){
+    if(SAVE.po<1||SAVE.shiny[k]) break;
+    SAVE.po--; gastos++;
+    if(Math.random()<CHANCE_SHINY){ SAVE.shiny[k]=true; achou=true; break; }
+  }
+  salvar();
+  if(achou){
+    som(880,.1,'triangle',.05); setTimeout(()=>som(1180,.1,'triangle',.05),110);
+    setTimeout(()=>som(1560,.25,'triangle',.05),220);
+    avisarTela('★ SHINY! '+POKE[k].nome+' brilhou.');
+  } else if(gastos) avisarTela('Nada. ('+gastos+' po de estrela)');
+  else avisarTela('Sem Po de Estrela.');
+  pintarArvore(k);
+}
+
+/* ---------- C. TM E BANNER SEMANAL ---------- */
+const TMS={
+ shadowball: {n:'Shadow Ball', tipo:'fantasma',compat:['fantasma','psiquico','veneno'],
+   d:'Ataque vira Fantasma e +5 de dano.',f:s=>{s.ataque='fantasma';s.dano+=5;}},
+ thunderbolt:{n:'Thunderbolt', tipo:'eletrico',compat:['eletrico','agua','voador','normal'],
+   d:'Ataque vira Eletrico e +4 de dano.',f:s=>{s.ataque='eletrico';s.dano+=4;}},
+ flamethrower:{n:'Flamethrower',tipo:'fogo',compat:['fogo','dragao','normal'],
+   d:'Ataque vira Fogo e +4 de dano.',f:s=>{s.ataque='fogo';s.dano+=4;}},
+ icebeam:    {n:'Ice Beam',    tipo:'gelo',compat:['agua','psiquico','normal','dragao'],
+   d:'Ataque vira Gelo, +3 de dano e congela o passo.',f:s=>{s.ataque='gelo';s.dano+=3;s.lento=.55;s.lentoT=1.5;}},
+ earthquake: {n:'Earthquake',  tipo:'terra',compat:['pedra','terra','lutador','normal','dragao'],
+   d:'Ataque vira Terra, ganha area 60 e +3 de dano.',f:s=>{s.ataque='terra';s.area=Math.max(s.area||0,60);s.dano+=3;}},
+ psychic:    {n:'Psychic',     tipo:'psiquico',compat:['psiquico','fantasma','normal'],
+   d:'Ataque vira Psiquico, +5 de penetracao e +2 de dano.',f:s=>{s.ataque='psiquico';s.pierce+=5;s.dano+=2;}},
+ rockslide:  {n:'Rock Slide',  tipo:'pedra',compat:['pedra','terra','lutador','fogo'],
+   d:'Ataque vira Pedra, +4 de dano e +2 de penetracao.',f:s=>{s.ataque='pedra';s.dano+=4;s.pierce+=2;}},
+ hyperbeam:  {n:'Hyper Beam',  tipo:'normal',compat:['*'],
+   d:'+10 de dano, mas cadencia 40% pior. Serve em qualquer um.',f:s=>{s.dano+=10;s.cad*=1.4;}}
+};
+const LISTA_TM=Object.keys(TMS);
+function tmCompativel(tm,k){ return TMS[tm].compat.includes('*')||TMS[tm].compat.includes(POKE[k].tipo); }
+/* semana real: o banner troca toda segunda, mas as fichas nunca travam */
+function semanaAtual(){
+  const d=new Date(), t=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate());
+  return Math.floor((t/86400000+3)/7);
+}
+let semanaTeste=0;
+function bannerSemana(){
+  let seed=(semanaAtual()+semanaTeste)*9301+49297;
+  const rnd=()=>((seed=(seed*9301+49297)%233280)/233280);
+  const pool=LISTA_TM.slice(), out=[];
+  for(let i=0;i<3&&pool.length;i++) out.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]);
+  return out;
+}
+function diasPraVirar(){
+  const d=new Date().getDay();   /* 0=domingo */
+  return d===1?7:(8-d)%7||7;
+}
+function atirarTM(n){
+  const b=bannerSemana();
+  let ganhos=[], po=0;
+  for(let i=0;i<n;i++){
+    if(SAVE.fichas<1) break;
+    SAVE.fichas--;
+    if(Math.random()<.6){
+      const pool=[];
+      for(const k of LISTA_TM){ pool.push(k); if(b.includes(k)) pool.push(k,k); }
+      const k=pool[Math.floor(Math.random()*pool.length)];
+      SAVE.tms[k]=(SAVE.tms[k]||0)+1; ganhos.push(TMS[k].n);
+    } else { SAVE.po++; po++; }
+  }
+  salvar();
+  if(ganhos.length){ som(880,.09,'triangle',.05); setTimeout(()=>som(1180,.14,'triangle',.05),100);
+    avisarTela('Veio: '+ganhos.join(', ')+(po?' (+'+po+' po)':'')); }
+  else if(po) avisarTela('So po de estrela desta vez: +'+po);
+  else avisarTela('Sem fichas. Ganhe jogando rodadas altas.');
+  pintarCassino();
+}
+
+/* ---------- D. TELA: TREINO (lista) ---------- */
+let arvoreAberta=null;
+function pintarTreino(){
+  const el=$('gradeTreino'); el.innerHTML='';
+  const donos=LISTA_POKE.filter(k=>TESTE||possui(k));
+  if(!donos.length){ el.innerHTML='<p style="color:var(--fraco);font-size:13px">Capture alguem no Safari primeiro.</p>'; }
+  for(const k of donos){
+    const p=POKE[k], x=xpDe(k);
+    const nos=Object.keys(SAVE.arvore[k]||{}).length;
+    const d=document.createElement('button');
+    d.className='eqc'+(SAVE.shiny[k]?' shiny':'');
+    d.innerHTML='<img src="'+urlPoke(k)+'">'+
+      '<div class="n">'+p.nome+(SAVE.shiny[k]?' ★':'')+'</div>'+chip(p.base.ataque)+
+      '<div class="xpn">'+x+' XP</div>'+
+      '<div class="non">'+nos+'/'+ARVORE.length+' nos</div>'+
+      (SAVE.tmEquip[k]&&temNo(k,'tm')?'<div class="tmn">'+TMS[SAVE.tmEquip[k]].n+'</div>':'');
+    d.onclick=()=>{ arvoreAberta=k; irPara('tArvore'); };
+    el.appendChild(d);
+  }
+  $('trPo').innerHTML='<img src="'+urlSpr('poestrela')+'">'+SAVE.po;
+}
+
+/* ---------- E. TELA: ARVORE DE UM POKEMON ---------- */
+function pintarArvore(k){
+  k=k||arvoreAberta; if(!k) return;
+  const p=POKE[k];
+  $('arNome').innerHTML=p.nome+' '+chip(p.base.ataque)+(SAVE.shiny[k]?'<span class="chip sh">SHINY</span>':'');
+  $('arXp').textContent=xpDe(k)+' XP';
+  $('arImg').src=urlPoke(k);
+  const el=$('arGrade'); el.innerHTML='';
+  for(let andar=1;andar<=4;andar++){
+    const lin=document.createElement('div'); lin.className='and';
+    const lib=andarLiberado(k,andar);
+    lin.innerHTML='<div class="andn">'+andar+'</div>';
+    for(const no of ARVORE.filter(n=>n.andar===andar)){
+      const meu=temNo(k,no.id), pode=podeComprarNo(k,no);
+      const bloqExc=no.exc&&temNo(k,no.exc);
+      const sig=no.id==='sig'?ASSINATURA[k]:null;
+      const d=document.createElement('div');
+      d.className='no'+(meu?' meu':'')+(pode?' pode':'')+((!lib||bloqExc)?' trav':'');
+      d.innerHTML='<div class="nn">'+(sig?sig.n:no.n)+'</div>'+
+        '<div class="nd">'+(sig?sig.d:no.d)+'</div>'+
+        '<div class="nc">'+(meu?'<span class="ok">✓ aprendido</span>'
+          :bloqExc?'<span class="x">bloqueado por '+ARVORE.find(z=>z.id===no.exc).n+'</span>'
+          :!lib?'<span class="x">trave o andar '+(andar-1)+'</span>'
+          :no.c+' XP')+'</div>';
+      if(pode) d.onclick=()=>comprarNo(k,no);
+      lin.appendChild(d);
+    }
+    el.appendChild(lin);
+  }
+  /* topo: idolo (shiny) ou slot de TM */
+  const cxS=$('arShiny'), cxT=$('arTM');
+  cxS.style.display=temNo(k,'idolo')?'':'none';
+  cxT.style.display=temNo(k,'tm')?'':'none';
+  if(temNo(k,'idolo')){
+    $('arPo').innerHTML='<img src="'+urlSpr('poestrela')+'">'+SAVE.po;
+    $('arShinyEstado').textContent=SAVE.shiny[k]
+      ? p.nome+' ja e shiny. Nao ha mais o que cacar aqui.'
+      : 'Chance de '+(CHANCE_SHINY*100).toFixed(1)+'% por po. Sem pity — e sorte pura.';
+    $('sh1').disabled=SAVE.po<1||!!SAVE.shiny[k];
+    $('sh25').disabled=SAVE.po<25||!!SAVE.shiny[k];
+  }
+  if(temNo(k,'tm')){
+    const l=$('arTMLista'); l.innerHTML='';
+    const meus=LISTA_TM.filter(t=>(SAVE.tms[t]||0)>0);
+    if(!meus.length) l.innerHTML='<p class="vazio">Voce nao tem nenhuma TM. Elas vem do Cassino.</p>';
+    for(const t of meus){
+      const ok=tmCompativel(t,k), eq=SAVE.tmEquip[k]===t;
+      const d=document.createElement('div');
+      d.className='tmc'+(eq?' eq':'')+(ok?'':' inc');
+      d.innerHTML='<div class="l">'+chip(TMS[t].tipo)+'<b>'+TMS[t].n+'</b><span class="q">x'+SAVE.tms[t]+'</span></div>'+
+        '<div class="d">'+(ok?TMS[t].d:'Incompativel com um Pokemon do tipo '+TIPOS[POKE[k].tipo].n+'.')+'</div>';
+      if(ok) d.onclick=()=>{
+        SAVE.tmEquip[k]=eq?null:t; salvar();
+        som(eq?330:660,.07,'triangle',.04); pintarArvore(k);
+      };
+      l.appendChild(d);
+    }
+  }
+}
+
+/* ---------- F. TELA: CASSINO (banner de TM) ---------- */
+function pintarCassino(){
+  $('csFichas').innerHTML='<img src="'+urlSpr('ficha')+'">'+SAVE.fichas;
+  $('csPo').innerHTML='<img src="'+urlSpr('poestrela')+'">'+SAVE.po;
+  $('csDias').textContent=diasPraVirar();
+  const b=bannerSemana(), el=$('csBanner'); el.innerHTML='';
+  for(const t of b){
+    const d=document.createElement('div'); d.className='tmc destaque';
+    d.innerHTML='<div class="l">'+chip(TMS[t].tipo)+'<b>'+TMS[t].n+'</b><span class="q">3x mais chance</span></div>'+
+      '<div class="d">'+TMS[t].d+'</div>'+
+      '<div class="q2">Serve em: '+(TMS[t].compat[0]==='*'?'qualquer um':TMS[t].compat.map(x=>TIPOS[x].n).join(', '))+'</div>';
+    el.appendChild(d);
+  }
+  const inv=$('csInv'); inv.innerHTML='';
+  const meus=LISTA_TM.filter(t=>(SAVE.tms[t]||0)>0);
+  if(!meus.length) inv.innerHTML='<p class="vazio">Nenhuma TM ainda.</p>';
+  for(const t of meus){
+    const d=document.createElement('div'); d.className='tmc';
+    d.innerHTML='<div class="l">'+chip(TMS[t].tipo)+'<b>'+TMS[t].n+'</b><span class="q">x'+SAVE.tms[t]+'</span></div>'+
+      '<div class="d">'+TMS[t].d+'</div>';
+    inv.appendChild(d);
+  }
+  $('cs1').disabled=SAVE.fichas<1;
+  $('cs10').disabled=SAVE.fichas<10;
+}
+/* ---------- 19. LOOP ---------- */
+let acumulado=0, ultimo=performance.now();
+function quadro(agora){
+  requestAnimationFrame(quadro);
+  let dt=(agora-ultimo)/1000; ultimo=agora;
+  if(dt>.25) dt=.25;
+  if(telaAtual!=='tJogo') return;
+  if(!pausado&&!fim&&jogando){
+    acumulado+=dt*velocidade;
+    const passo=1/60; let n=0;
+    while(acumulado>=passo&&n<20){ atualizar(passo); acumulado-=passo; n++; }
+    if(n>0) atualizarHUD();
+  }
+  desenhar();
+}
+$('hBolImg').src=urlSpr('pokebola');
+irPara(SAVE.inicial?'tMenu':'tInicial');
+requestAnimationFrame(quadro);
+</script>
+</body>
+</html>
