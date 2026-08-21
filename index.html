@@ -65,6 +65,7 @@ body{
 .mst b{display:block;font-size:19px;font-family:ui-monospace,monospace}
 .mst i{font-style:normal;font-size:9.5px;letter-spacing:1.6px;color:var(--fraco);font-weight:700;text-transform:uppercase}
 #menuBtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#versao{font-family:ui-monospace,monospace;font-size:11px;color:#41527a;letter-spacing:1.4px;margin-top:4px}
 
 /* ---------- ESCOLHA DO INICIAL ---------- */
 #gradeInicial{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
@@ -223,6 +224,10 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;cursor:cro
 #prev .p.camu{border-color:var(--roxo);background:#1a1226}
 #prev .p img{width:20px;height:20px;image-rendering:pixelated}
 #prev .p b{font-family:ui-monospace,monospace;font-size:11px;color:var(--fraco)}
+.estreia{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;padding:6px 8px;
+  background:#0e1520;border:1px solid var(--borda);border-radius:8px;font-size:10.5px;color:var(--fraco);line-height:1.4}
+.estreia img{width:22px;height:22px;image-rendering:pixelated}
+.estreia.camu{border-color:var(--roxo);background:#1a1226;color:#c9a8e8}
 #tela{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(6,9,14,.9);backdrop-filter:blur(3px);text-align:center;padding:24px}
 #tela.ver{display:flex}
@@ -280,6 +285,7 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;cursor:cro
   </div>
   <div id="testeInfo">Modo teste: dinheiro infinito, todos os Pokemon, todos os mapas, sem limite de unidades.<br>
     Nada e salvo — nem pokebolas, nem mapas limpos. O limite de "so um por forma final" continua valendo.</div>
+  <div id="versao">versao <span id="vNum">0.2</span></div>
 </section>
 
 <!-- ============ ESCOLHA DO INICIAL ============ -->
@@ -414,6 +420,7 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;cursor:cro
       <div class="caixa">
         <div class="tit">Proxima onda</div>
         <div id="prev"></div>
+        <div id="estreia" class="estreia" style="display:none"></div>
         <button class="btn verde" id="bOnda" style="width:100%;margin-top:9px;padding:9px;font-size:14px">▶ Iniciar Rodada 1</button>
         <label id="lAuto"><input type="checkbox" id="cAuto"> Rodada automatica</label>
       </div>
@@ -442,6 +449,10 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;cursor:cro
    Arquivo unico, sem dependencias. Canvas 2D + pixel art embutida.
    Progresso salvo em localStorage.
    ============================================================ */
+
+/* ---------- 0. VERSAO ----------
+   Sobe junto com cada mudanca. Aparece no rodape do menu. */
+const VERSAO='0.2';
 
 /* ---------- 1. UTIL ---------- */
 const CV=document.getElementById('cv'), G=CV.getContext('2d');
@@ -1217,6 +1228,37 @@ Object.assign(ARTE,ARTE2);
    Precisa vir DEPOIS do Object.assign — dentro do literal ARTE2 o ARTE.gastly
    ainda nao existe, e a referencia derruba o script inteiro em silencio. */
 ARTE.gastly3={s:3,p:ARTE.gastly.p,r:ARTE.gastly.r};
+
+/* Inimigos tardios: a Rocket evolui o que rouba. Reaproveita as linhas do
+   estagio anterior com paleta trocada — variante praticamente de graca.
+   Tudo isto DEPOIS do Object.assign, senao a referencia nao existe ainda. */
+ARTE.raticate  ={s:2,p:{'1':'#3a2418','2':'#c8a068','3':'#e8c890','4':'#f0e0c0','5':'#2b1d16','6':'#fff'},r:ARTE.rattata.r};
+ARTE.golbat    ={s:2,p:{'1':'#1a1a4a','2':'#4a4ab0','3':'#7070d8','4':'#8a3a7a','5':'#fff','6':'#3a1030'},r:ARTE.zubat.r};
+ARTE.arbok     ={s:2,p:{'1':'#2a1a3a','2':'#6a3a9a','3':'#8f5fc0','4':'#e8d060','5':'#2b1d16','6':'#e8453c'},r:ARTE.ekans.r};
+ARTE.weezing   ={s:2,p:{'1':'#1a1a2a','2':'#4a3a70','3':'#6a5a96','4':'#2a2048','5':'#2b1d16','6':'#f5f5f5','7':'#8a8ab0'},r:ARTE.koffing.r};
+ARTE.graveler_r={s:2,p:{'1':'#241a14','2':'#7a6250','3':'#9c8168','4':'#54443a','5':'#2b1d16','6':'#e8453c'},r:ARTE.geodude_r.r};
+ARTE.magneton  ={s:2,p:{'1':'#20263a','2':'#c0c8d8','3':'#e8eef8','4':'#2b1d16','5':'#fff','6':'#e8453c','7':'#3d7dd8','8':'#5a6478'},r:ARTE.magnemite.r};
+ARTE.haunter_e ={s:2,p:ARTE.haunter.p,r:ARTE.haunter.r};
+ARTE.gengar_e  ={s:2,p:ARTE.gengar.p,r:ARTE.gengar.r};
+ARTE.machoke_r ={s:2,p:{'1':'#2a1a2a','2':'#8a6a9a','3':'#b090c0','4':'#3a1a1a','5':'#2b1d16','6':'#fff','7':'#5a3a2a','8':'#c04040'},r:ARTE.machoke.r};
+/* chefe da onda 100 */
+ARTE.mewtwo={s:3,p:{'1':'#3a2a4a','2':'#b8a8c8','3':'#e0d4ec','4':'#8a5a9a','5':'#7038f8','6':'#fff'},r:[
+'......11111.......',
+'.....1222221......',
+'....122333221.....',
+'....123333321.....',
+'....125333521.....',
+'....123333321.....',
+'....122333221...4.',
+'.....12333321..44.',
+'......122221..44..',
+'....111222211144..',
+'...12222222222 1..',
+'..1222222222221...',
+'..1222222222221...',
+'...11222222211....',
+'....1122222111....',
+'.....11....11.....']};
 const SPR={}; for(const k in ARTE) SPR[k]=montar(ARTE[k].p,ARTE[k].r,ARTE[k].s);
 const CACHE_URL={}; const urlSpr=k=>CACHE_URL[k]||(CACHE_URL[k]=SPR[k].toDataURL());
 
@@ -1257,10 +1299,24 @@ function efic(atk,alvo){
   return m;
 }
 
-/* ---------- 4. MAPAS ---------- */
+/* ---------- 4. MAPAS ----------
+   A geometria E a dificuldade:
+   - ESPIRAL: torres no miolo cobrem varias voltas de uma vez. Facil.
+   - CURVAS: cobertura media, exige escolher os cotovelos. Medio.
+   - CORREDOR LONGO E ESTREITO: caminho enorme, quase sem chao pra construir.
+     Poucas torres cobrindo muito. Dificil.
+   `escala` mexe no orcamento de ameaca da onda, `limite` no numero de unidades. */
+const TIERS={
+  noob:   {n:'Noob',                        c:'#6fe08d', bg:'#12331c'},
+  facil:  {n:'Facil',                       c:'#9ad86f', bg:'#1c3315'},
+  medio:  {n:'Ate que vai',                 c:'#ffcb05', bg:'#33280f'},
+  brabo:  {n:'Tu quer e desafio e n sabe pedir', c:'#ff7d75', bg:'#3a1414'}
+};
+const FORMAS={curvas:'curvas',espiral:'espiral',corredor:'corredor estreito'};
 const MAPAS=[
-{id:'rota1', nome:'Rota 1', sub:'KANTO', dific:'Facil', hpMult:1, bolasFim:30, bolasRod:2, roubomax:20, dinIni:700, limite:10,
- aviso:'O basico. Boa rota pra aprender a mira e a economia.',
+{id:'rota1', nome:'Rota 1', sub:'KANTO', tier:'noob', forma:'curvas',
+ semente:101, escala:.62, hpMult:1, bolasFim:30, bolasRod:2, roubomax:25, dinIni:750, limite:14,
+ aviso:'Curvas largas e chao de sobra. E aqui que se aprende a mirar.',
  cor:{solo:'#4e9a5c',s2:'rgba(70,140,84,.5)',s3:'rgba(96,178,106,.45)',g1:'rgba(126,200,132,.55)',g2:'rgba(58,120,70,.5)',
       c1:'#6b5a38',c2:'#a8905e',c3:'#c9b184',p1:'rgba(160,132,88,.7)',p2:'rgba(224,204,166,.6)'},
  caminho:[[-40,300],[130,300],[196,176],[330,136],[440,236],[440,404],[566,476],[706,436],[766,300],[700,186],[832,124],[884,124]],
@@ -1271,7 +1327,17 @@ const MAPAS=[
         ['pedra',230,250],['pedra',520,180],['pedra',350,530],['pedra',620,340],['pedra',830,240],
         ['pedra',90,360],['pedra',480,330],['pedra',745,90]]},
 
-{id:'floresta', nome:'Floresta de Viridian', sub:'KANTO', dific:'Media', hpMult:1.25, bolasFim:60, bolasRod:4, roubomax:20, dinIni:800, limite:12,
+{id:'celadon', nome:'Jardim de Celadon', sub:'KANTO', tier:'noob', forma:'espiral',
+ semente:202, escala:.95, hpMult:1.05, bolasFim:45, bolasRod:3, roubomax:25, dinIni:800, limite:12,
+ aviso:'Espiral. Uma torre no miolo cobre volta apos volta — abuse disso.',
+ cor:{solo:'#54a866',s2:'rgba(64,140,80,.5)',s3:'rgba(110,196,120,.45)',g1:'rgba(150,220,150,.5)',g2:'rgba(52,116,66,.5)',
+      c1:'#7a6a4a',c2:'#b8a880',c3:'#ddd0ae',p1:'rgba(176,158,120,.7)',p2:'rgba(240,232,206,.5)'},
+ caminho:[[-40,64],[884,64],[884,540],[76,540],[76,152],[796,152],[796,452],[164,452],[164,240],[708,240],[708,364],[300,364],[300,306],[556,306]],
+ centro:[600,306],
+ decorAuto:26, decorTipos:['arvore','cogumelo','cogumelo','pedra']},
+
+{id:'floresta', nome:'Floresta de Viridian', sub:'KANTO', tier:'facil', forma:'curvas',
+ semente:303, escala:1, hpMult:1.15, bolasFim:60, bolasRod:4, roubomax:22, dinIni:850, limite:12,
  aviso:'Escuro demais. Tem coisa camuflada aqui — sem faro, voce nao acerta.',
  cor:{solo:'#2f6b45',s2:'rgba(36,88,56,.55)',s3:'rgba(62,124,78,.5)',g1:'rgba(96,168,110,.5)',g2:'rgba(26,70,44,.55)',
       c1:'#3d3020',c2:'#6d573a',c3:'#8e7550',p1:'rgba(110,88,58,.7)',p2:'rgba(170,148,108,.45)'},
@@ -1284,7 +1350,8 @@ const MAPAS=[
         ['cogumelo',120,230],['cogumelo',300,470],['cogumelo',480,520],['cogumelo',700,340],
         ['cogumelo',860,360],['cogumelo',230,140],['pedra',420,180],['pedra',560,560],['pedra',760,380]]},
 
-{id:'montelua', nome:'Monte Lua', sub:'KANTO', dific:'Dificil', hpMult:1.6, bolasFim:110, bolasRod:7, roubomax:25, dinIni:950, limite:14,
+{id:'montelua', nome:'Monte Lua', sub:'KANTO', tier:'medio', forma:'curvas',
+ semente:404, escala:1.22, hpMult:1.3, bolasFim:110, bolasRod:6, roubomax:22, dinIni:900, limite:11,
  aviso:'Caverna cheia de Pedra/Terra. Eletrico nao encosta neles.',
  cor:{solo:'#494460',s2:'rgba(56,50,78,.55)',s3:'rgba(94,86,120,.45)',g1:'rgba(132,122,166,.35)',g2:'rgba(38,34,56,.5)',
       c1:'#4e4762',c2:'#847c94',c3:'#a49cb6',p1:'rgba(116,108,136,.6)',p2:'rgba(198,190,214,.45)'},
@@ -1294,18 +1361,41 @@ const MAPAS=[
         ['cristal',920,140],['cristal',560,560],['cristal',180,240],
         ['pedra',390,240],['pedra',700,240],['pedra',420,340],['pedra',880,340],['pedra',240,420],
         ['pedra',600,500],['pedra',120,90],['pedra',900,540],['pedra',540,120],['pedra',760,60],
-        ['pedra',60,470],['pedra',330,560]]}
+        ['pedra',60,470],['pedra',330,560]]},
+
+{id:'silph', nome:'Silph Co.', sub:'CIDADE DE SAFRAO', tier:'medio', forma:'corredor',
+ semente:505, escala:1.55, hpMult:1.4, bolasFim:160, bolasRod:8, roubomax:20, dinIni:1000, limite:9,
+ aviso:'Corredores retos e compridos. Quase nao sobra chao — cada torre tem que valer por tres.',
+ cor:{solo:'#2b3446',s2:'rgba(34,42,58,.6)',s3:'rgba(56,68,90,.45)',g1:'rgba(88,104,134,.3)',g2:'rgba(24,30,42,.5)',
+      c1:'#38445c',c2:'#5d6f8f',c3:'#8496b6',p1:'rgba(120,138,168,.5)',p2:'rgba(190,206,232,.35)'},
+ caminho:[[-40,72],[892,72],[892,168],[68,168],[68,264],[892,264],[892,360],[68,360],[68,456],[892,456],[892,548],[120,548]],
+ centro:[64,548],
+ decorAuto:12, decorTipos:['cristal','pedra']},
+
+{id:'covil', nome:'Covil da Rocket', sub:'SUBSOLO', tier:'brabo', forma:'corredor',
+ semente:606, escala:2.2, hpMult:1.55, bolasFim:240, bolasRod:11, roubomax:20, dinIni:1100, limite:8,
+ aviso:'O caminho mais longo do jogo e o menor espaco pra construir. Boa sorte.',
+ cor:{solo:'#2a1c22',s2:'rgba(38,24,30,.6)',s3:'rgba(62,40,48,.45)',g1:'rgba(104,60,68,.28)',g2:'rgba(20,12,16,.55)',
+      c1:'#3e2a30',c2:'#6a4a52',c3:'#8f6a72',p1:'rgba(140,96,104,.45)',p2:'rgba(210,160,168,.3)'},
+ caminho:[[480,-40],[480,56],[76,56],[76,148],[884,148],[884,240],[160,240],[160,332],[884,332],
+          [884,424],[76,424],[76,516],[820,516],[820,584],[300,584]],
+ centro:[240,584],
+ decorAuto:10, decorTipos:['pedra','cristal']}
 ];
 
 /* ---------- 5. POKEMON JOGAVEIS ---------- */
+/* Pity por raridade: quanto mais raro, mais longe fica a garantia.
+   Antes era 100 pra todo mundo e dava pra fechar a colecao rapido demais. */
 const RARIDADE={
-  inicial:  {n:'Inicial',   c:'#7fb4ff', ch:.12},
-  comum:    {n:'Comum',     c:'#8b9ab4', ch:.12},
-  incomum:  {n:'Incomum',   c:'#4cc76a', ch:.05},
-  raro:     {n:'Raro',      c:'#3d7dd8', ch:.025},
-  lendario: {n:'Lendario',  c:'#ffcb05', ch:.012}
+  inicial:  {n:'Inicial',  c:'#7fb4ff', ch:.09,   pity:40},
+  comum:    {n:'Comum',    c:'#8b9ab4', ch:.075,  pity:50},
+  incomum:  {n:'Incomum',  c:'#4cc76a', ch:.030,  pity:110},
+  raro:     {n:'Raro',     c:'#3d7dd8', ch:.012,  pity:220},
+  epico:    {n:'Epico',    c:'#a86fd6', ch:.006,  pity:380},
+  lendario: {n:'Lendario', c:'#ffcb05', ch:.003,  pity:600},
+  mitico:   {n:'Mitico',   c:'#ff7d75', ch:.0012, pity:900}
 };
-const PITY=100;
+const pityDe = k=>RARIDADE[POKE[k].rar].pity;
 
 const POKE={
  charmander:{nome:'Charmander', spr:'charmander', tipo:'fogo', rar:'inicial', custo:150,
@@ -1390,6 +1480,271 @@ const POKE={
        {n:'Dragonite',c:4200,evo:'dragonite',final:true,d:'APICE. Dano 30, enxerga camuflado, acaba com a conversa. So pode existir um.',f:s=>{s.dano=30;s.pierce=8;s.cad=.35;s.detecta=true;s.alcance+=55;}}]}
 };
 const LISTA_POKE=['charmander','bulbasaur','squirtle','pikachu','machop','growlithe','abra','gastly','eevee','dratini'];
+
+/* ---------- 5b. PAPEIS ----------
+   Cada Pokemon tem uma funcao declarada. E o que impede a dex de virar
+   151 variacoes de "atira mais rapido" — e o que orienta montar time. */
+const PAPEIS={
+ atirador:  {n:'Atirador',  c:'#7fb4ff', d:'Alvo unico, rapido e barato. O alicerce.'},
+ massa:     {n:'Massa',     c:'#e8453c', d:'Dano brutal, alcance curto. Quer cotovelo de curva.'},
+ area:      {n:'Area',      c:'#f08030', d:'Explode e pega o grupo inteiro.'},
+ continuo:  {n:'Continuo',  c:'#a040a0', d:'Queima ou envenena: dano que segue depois do tiro.'},
+ controle:  {n:'Controle',  c:'#98d8d8', d:'Segura, atrasa e da tempo pro resto trabalhar.'},
+ suporte:   {n:'Suporte',   c:'#ffcb05', d:'Nao mata: faz os vizinhos matarem melhor.'},
+ cadeia:    {n:'Cadeia',    c:'#f8d030', d:'Salta de alvo em alvo.'},
+ perfurante:{n:'Perfurante',c:'#7038f8', d:'Atravessa a fila toda de uma vez.'},
+ farejador: {n:'Farejador', c:'#705898', d:'Enxerga camuflado. Sem um destes, tem onda que passa direto.'}
+};
+
+/* ---------- 5c. SPRITES DO LOTE NOVO ---------- */
+const P_BALAO={'1':'#8a4a68','2':'#f0a8c8','3':'#ffd0e4','4':'#2b1d16','5':'#ffffff','6':'#5ad0e0','7':'#e86f9a'};
+const P_ROSA ={'1':'#8a4a58','2':'#f0b0c0','3':'#ffd8e0','4':'#2b1d16','5':'#ffffff','6':'#f5e8d0'};
+const P_RAPO ={'1':'#7a3418','2':'#e06838','3':'#ff9060','4':'#f8e0b8','5':'#2b1d16','6':'#ffffff'};
+const P_NOVE ={'1':'#8a7020','2':'#f0d8a0','3':'#fff0d0','4':'#e8c060','5':'#2b1d16','6':'#ffffff'};
+const P_GIRI ={'1':'#1a4a5a','2':'#5aa8c8','3':'#8fd0e8','4':'#f5f5f8','5':'#2b1d16','6':'#e8a0c0'};
+const P_PLANT={'1':'#3a5a18','2':'#8ac040','3':'#b0e070','4':'#f0d840','5':'#2b1d16','6':'#e8a030'};
+const P_TOUP ={'1':'#3a2418','2':'#8a5a38','3':'#b08050','4':'#f0b0a0','5':'#2b1d16','6':'#ffffff','7':'#5a3a20'};
+
+const ARTE3={
+jigglypuff:{s:3,p:P_BALAO,r:[
+'.....11111......',
+'...113333311....',
+'..13322222331...',
+'.1332222222331..',
+'.1322222222231..',
+'132244222442231.',
+'132254222452231.',
+'132222222222231.',
+'132226666622231.',
+'132222222222231.',
+'.13222222222 1..',
+'.1332222222331..',
+'..13322222331...',
+'...1132223311...',
+'....11.1.11.....',
+'................']},
+chansey:{s:3,p:P_ROSA,r:[
+'.....11111......',
+'....1233321.....',
+'...123333321....',
+'...124333421....',
+'...123333321....',
+'....1233321.....',
+'..11122222111...',
+'.132222222231...',
+'.13266666663 1..',
+'132666666666231.',
+'132666666666231.',
+'132666666666231.',
+'.13266666663 1..',
+'.1322222222 1...',
+'..1122222211....',
+'...11.111.11....']},
+vulpix:{s:3,p:P_RAPO,r:[
+'..11.......11...',
+'.1221.....1221..',
+'.12321...12321..',
+'..1233111332 1..',
+'..123333333321..',
+'..125333335321..',
+'..123331133321..',
+'..112333333211..',
+'...1122222211...',
+'..1444444444 1..',
+'.14444444444441.',
+'.14444444444441.',
+'..114444444411..',
+'...11111111 1...',
+'................',
+'................']},
+ninetales:{s:3,p:P_NOVE,r:[
+'..11.......11.....',
+'.1221.....1221....',
+'.12321...12321..44',
+'..1233111332 1.444',
+'..123333333321444.',
+'..125333335321444.',
+'..123331133321.44.',
+'..112333333211444.',
+'...11222222114444.',
+'..14444444444444..',
+'.144444444444444..',
+'.14444444444444...',
+'..1144444444 1....',
+'...1111111111.....',
+'..................',
+'..................']},
+poliwag:{s:3,p:P_GIRI,r:[
+'.....11111......',
+'...113333311....',
+'..1322222231....',
+'.132244442231...',
+'.132455554231...',
+'.132455554231...',
+'.132244442231...',
+'.1322222222 1...',
+'.13222222223 1..',
+'..132222223 1...',
+'...1332223311...',
+'....11333311....',
+'.....111111.....',
+'......1221......',
+'.....12221......',
+'.....11.11......']},
+poliwhirl:{s:3,p:P_GIRI,r:[
+'....1111111.....',
+'..113333333 1...',
+'.13222222223 1..',
+'.1322444442231..',
+'132245555422 31.',
+'132455555542231.',
+'132455555542231.',
+'132244555442231.',
+'1322244444222 1.',
+'.13222222222 1..',
+'.1322222222231..',
+'..1332222233 1..',
+'...113333311....',
+'....1122211.....',
+'...1221.1221....',
+'...111...111....']},
+bellsprout:{s:3,p:P_PLANT,r:[
+'......6661......',
+'.....666661.....',
+'....16644661....',
+'....16655661....',
+'....166666 1....',
+'.....116611.....',
+'......1221......',
+'......1221......',
+'.....132231.....',
+'.....132231.....',
+'....13222231....',
+'....13222231....',
+'...1322222231...',
+'...1122222211...',
+'..1121.....1211.',
+'..111.......111.']},
+weepinbell:{s:3,p:P_PLANT,r:[
+'.......11.......',
+'......1661......',
+'.....166661.....',
+'...11666666 1...',
+'..1322444422 1..',
+'.132224455422 1.',
+'.132244555442 1.',
+'.13224455544231.',
+'.13222444442231.',
+'.1322266622231..',
+'..132222222231..',
+'..1322222222 1..',
+'...13222222 1...',
+'....132223 1....',
+'.....113311.....',
+'......1111......']},
+diglett:{s:3,p:P_TOUP,r:[
+'................',
+'................',
+'................',
+'.....11111......',
+'....1233321.....',
+'...123333321....',
+'...125333521....',
+'...123333321....',
+'...126333621....',
+'...123333321....',
+'..11233333211...',
+'.17722222277 1..',
+'.17777777777 1..',
+'.1777777777771..',
+'..11111111111...',
+'................']},
+dugtrio:{s:3,p:P_TOUP,r:[
+'..............1.',
+'....111....1111.',
+'...12321..123321',
+'...12532..125321',
+'...12332..123321',
+'..1123321112332 ',
+'.112332111233211',
+'.1253211125321..',
+'.1233211123321..',
+'11233211233211..',
+'12332112332111..',
+'12532112532 1...',
+'123321123321....',
+'77722277722277..',
+'77777777777777..',
+'.1111111111111..']}
+};
+Object.assign(ARTE,ARTE3);
+/* formas finais por recolorizacao — DEPOIS do assign, senao a referencia nao existe */
+ARTE.wigglytuff={s:3,p:{'1':'#6a3a58','2':'#e88ab4','3':'#ffc0dc','4':'#2b1d16','5':'#ffffff','6':'#3ab8cc','7':'#d8558a'},r:ARTE.jigglypuff.r};
+ARTE.blissey   ={s:3,p:{'1':'#7a3a48','2':'#f89ab0','3':'#ffd0dc','4':'#2b1d16','5':'#ffffff','6':'#fff4d8'},r:ARTE.chansey.r};
+for(const k of ['wigglytuff','blissey']) ARTE3[k]=ARTE[k];
+for(const k in ARTE3) SPR[k]=montar(ARTE[k].p,ARTE[k].r,ARTE[k].s);
+
+/* ---------- 5d. LOTE NOVO: os papeis que faltavam ---------- */
+Object.assign(POKE,{
+ jigglypuff:{nome:'Jigglypuff', spr:'jigglypuff', tipo:'normal', papel:'suporte', rar:'incomum', custo:450,
+  desc:'Canta e acelera todo mundo em volta. Sozinho e inutil — do lado dos outros, dobra a defesa.',
+  base:{alcance:70,cad:2.2,dano:1,pierce:2,velproj:220,proj:'nota',ataque:'normal',
+        aura:{r:118,cad:.88}},
+  ups:[{n:'Cantiga',c:280,d:'Aura mais forte (-18% de recarga) e mais larga.',f:s=>{s.aura={r:140,cad:.82};}},
+       {n:'Eco',c:600,d:'A aura tambem da +1 de penetracao pros vizinhos.',f:s=>{s.aura={r:150,cad:.8,pierce:1};}},
+       {n:'Wigglytuff',c:1500,evo:'wigglytuff',final:true,d:'APICE. -28% de recarga, +2 penetracao e alcance de aura enorme.',
+        f:s=>{s.aura={r:180,cad:.72,pierce:2,alcance:18}; s.dano=4;}}]},
+
+ chansey:{nome:'Chansey', spr:'chansey', tipo:'normal', papel:'suporte', rar:'raro', custo:700,
+  desc:'Distribui ovo e moral: os vizinhos batem muito mais forte.',
+  base:{alcance:60,cad:2.6,dano:1,pierce:1,velproj:200,proj:'nota',ataque:'normal',
+        aura:{r:112,dano:1.25}},
+  ups:[{n:'Ovo da Sorte',c:400,d:'Vizinhos com +40% de dano.',f:s=>{s.aura={r:125,dano:1.4};}},
+       {n:'Cura Natural',c:820,d:'+55% de dano e +14 de alcance nos vizinhos.',f:s=>{s.aura={r:140,dano:1.55,alcance:14};}},
+       {n:'Blissey',c:2100,evo:'blissey',final:true,d:'APICE. +85% de dano, +25 de alcance e aura gigante. So pode existir uma.',
+        f:s=>{s.aura={r:175,dano:1.85,alcance:25};}}]},
+
+ vulpix:{nome:'Vulpix', spr:'vulpix', tipo:'fogo', papel:'continuo', rar:'incomum', custo:480,
+  desc:'Nao mata na hora: incendeia. A queimadura segue queimando depois do tiro.',
+  base:{alcance:108,cad:.9,dano:2,pierce:2,velproj:320,proj:'brasa',ataque:'fogo',
+        dot:{dano:4,dur:2.5}},
+  ups:[{n:'Fogo-Fatuo',c:300,d:'Queimadura de 8/s por 3s.',f:s=>{s.dot={dano:8,dur:3};}},
+       {n:'Brasa Viva',c:640,d:'Dano 4 e queimadura de 14/s.',f:s=>{s.dano=4;s.dot={dano:14,dur:3.5};}},
+       {n:'Ninetales',c:1900,evo:'ninetales',final:true,d:'APICE. Dano 9, penetracao 6 e queimadura de 34/s por 5s.',
+        f:s=>{s.dano=9;s.pierce=6;s.cad=.5;s.alcance+=45;s.dot={dano:34,dur:5};}}]},
+
+ bellsprout:{nome:'Bellsprout', spr:'bellsprout', tipo:'grama', papel:'continuo', rar:'comum', custo:380,
+  desc:'Veneno que ignora armadura e nao para. Barato e cruel em fila longa.',
+  base:{alcance:96,cad:1.1,dano:2,pierce:4,velproj:240,proj:'vinha',ataque:'veneno',
+        dot:{dano:5,dur:3}},
+  ups:[{n:'Acido',c:260,d:'Veneno de 10/s e penetracao 6.',f:s=>{s.dot={dano:10,dur:3.5};s.pierce=6;}},
+       {n:'Chicote Duplo',c:560,d:'Dano 4 e veneno de 18/s.',f:s=>{s.dano=4;s.dot={dano:18,dur:4};}},
+       {n:'Weepinbell',c:1700,evo:'weepinbell',final:true,d:'APICE. Penetracao 12 e veneno de 40/s por 5s.',
+        f:s=>{s.dano=7;s.pierce=12;s.cad=.7;s.alcance+=38;s.dot={dano:40,dur:5};}}]},
+
+ poliwag:{nome:'Poliwag', spr:'poliwag', tipo:'agua', papel:'controle', rar:'comum', custo:340,
+  desc:'Nao faz dano decente. Faz a onda inteira andar em camera lenta.',
+  base:{alcance:104,cad:1.0,dano:1,pierce:6,velproj:230,proj:'bolha',ataque:'agua',
+        area:40,lento:.55,lentoT:2},
+  ups:[{n:'Hipnose',c:280,d:'Lentidao pra 40% da velocidade, por 2,6s.',f:s=>{s.lento=.4;s.lentoT=2.6;}},
+       {n:'Redemoinho',c:580,d:'Area maior e dano 3.',f:s=>{s.dano=3;s.area=62;}},
+       {n:'Poliwhirl',c:1600,evo:'poliwhirl',final:true,d:'APICE. Quase congela (25% da velocidade) por 3,4s numa area enorme.',
+        f:s=>{s.dano=6;s.area=86;s.cad=.7;s.alcance+=34;s.lento=.25;s.lentoT=3.4;}}]},
+
+ diglett:{nome:'Diglett', spr:'diglett', tipo:'terra', papel:'atirador', rar:'comum', custo:180,
+  desc:'Baratissimo e some no chao. Terra bate 2x em Aco, Pedra, Fogo, Eletrico e Veneno.',
+  base:{alcance:100,cad:.6,dano:2,pierce:1,velproj:330,proj:'pedrada',ataque:'terra'},
+  ups:[{n:'Cavar Fundo',c:150,d:'+35 de alcance e penetracao 2.',f:s=>{s.alcance+=35;s.pierce=2;}},
+       {n:'Terremoto',c:420,d:'Dano 5 com respingo em area.',f:s=>{s.dano=5;s.area=48;}},
+       {n:'Dugtrio',c:1400,evo:'dugtrio',final:true,d:'APICE. Tres cabecas: dano 11 em area, tres vezes mais rapido.',
+        f:s=>{s.dano=11;s.area=70;s.cad=.24;s.alcance+=28;}}]}
+});
+LISTA_POKE.push('diglett','poliwag','bellsprout','jigglypuff','vulpix','chansey');
+
+/* papeis dos que ja existiam */
+const PAPEL_DE={charmander:'atirador',bulbasaur:'controle',squirtle:'area',pikachu:'cadeia',
+ machop:'massa',growlithe:'farejador',abra:'perfurante',gastly:'farejador',eevee:'atirador',dratini:'perfurante'};
+for(const k in PAPEL_DE) POKE[k].papel=PAPEL_DE[k];
 const INICIAIS=['charmander','bulbasaur','squirtle'];
 const MIRAS=[['primeiro','1o'],['ultimo','Ult'],['forte','Forte'],['perto','Perto']];
 
@@ -1408,43 +1763,96 @@ const INIMIGOS={
  elite2:{nome:'Rocket das Sombras',hp:140,vel:34,spr:'elite2',rec:32,roubo:5,raio:14,resist:.7,camu:true,tipos:['sombrio'],filhos:['espiao','espiao']},
  meowth:{nome:'Balao do Meowth',hp:450,vel:24,spr:'balao',rec:150,roubo:10,raio:24,resist:.85,voa:true,chefe:true,tipos:['normal','voador'],filhos:['grunt','grunt','grunt','grunt']},
  meowthc:{nome:'Balao Fantasma',hp:420,vel:26,spr:'balao',rec:180,roubo:10,raio:24,resist:.85,voa:true,camu:true,chefe:true,tipos:['fantasma','voador'],filhos:['espiao','espiao','gastly','gastly']},
- onix:{nome:'Onix Mecanico',hp:1800,vel:18,spr:'onix',rec:600,roubo:15,raio:30,resist:.8,chefe:true,tipos:['pedra','terra'],filhos:['geodude_r','geodude_r','geodude_r','geodude_r']}
+ onix:{nome:'Onix Mecanico',hp:1800,vel:18,spr:'onix',rec:600,roubo:15,raio:30,resist:.8,chefe:true,tipos:['pedra','terra'],filhos:['geodude_r','geodude_r','geodude_r','geodude_r']},
+
+ /* --- tardios (a Rocket evolui o que rouba) --- */
+ raticate:{nome:'Raticate Roubado',hp:70,vel:82,spr:'raticate',rec:9,roubo:2,raio:12,tipos:['normal'],filhos:['rattata','rattata']},
+ golbat:{nome:'Golbat Roubado',hp:90,vel:96,spr:'golbat',rec:11,roubo:2,raio:13,voa:true,tipos:['veneno','voador'],filhos:['zubat','zubat']},
+ arbok:{nome:'Arbok Roubado',hp:150,vel:62,spr:'arbok',rec:16,roubo:3,raio:14,tipos:['veneno'],filhos:['ekans','ekans']},
+ weezing:{nome:'Weezing Roubado',hp:230,vel:34,spr:'weezing',rec:24,roubo:4,raio:14,voa:true,resist:.85,tipos:['veneno'],filhos:['koffing','koffing']},
+ graveler_r:{nome:'Graveler Roubado',hp:340,vel:26,spr:'graveler_r',rec:34,roubo:5,raio:16,resist:.75,tipos:['pedra','terra'],filhos:['geodude_r','geodude_r']},
+ magneton:{nome:'Magneton Roubado',hp:280,vel:70,spr:'magneton',rec:30,roubo:4,raio:15,voa:true,resist:.8,tipos:['eletrico','aco'],filhos:['magnemite','magnemite']},
+ machoke_r:{nome:'Machoke Roubado',hp:400,vel:44,spr:'machoke_r',rec:40,roubo:5,raio:15,resist:.8,tipos:['lutador'],filhos:['grunt','grunt']},
+ haunter_e:{nome:'Haunter Roubado',hp:300,vel:66,spr:'haunter_e',rec:36,roubo:4,raio:15,voa:true,camu:true,tipos:['fantasma','veneno'],filhos:['gastly','gastly']},
+ gengar_e:{nome:'Gengar Roubado',hp:620,vel:58,spr:'gengar_e',rec:70,roubo:7,raio:17,camu:true,resist:.75,tipos:['fantasma','veneno'],filhos:['haunter_e','haunter_e']},
+ mewtwo:{nome:'Mewtwo Blindado',hp:9000,vel:16,spr:'mewtwo',rec:2500,roubo:25,raio:34,resist:.7,chefe:true,camu:true,tipos:['psiquico'],
+   filhos:['gengar_e','gengar_e','machoke_r','machoke_r','graveler_r','graveler_r']}
 };
 
-/* ---------- 7. RODADAS ---------- */
-const R=(...g)=>g.map(a=>({t:a[0],n:a[1],g:a[2],e:a[3]||0}));
-const RODADAS={
-rota1:[
- R(['rattata',8,.75]), R(['rattata',14,.5]), R(['rattata',10,.45],['zubat',5,.6,4]),
- R(['zubat',10,.45],['rattata',10,.4,2]), R(['ekans',8,.7],['rattata',12,.35,3]),
- R(['koffing',6,1],['zubat',10,.35,2]), R(['grunt',4,1.6],['ekans',10,.5,2]),
- R(['koffing',10,.7],['grunt',5,1.4,4]),
- R(['elite',2,4],['grunt',6,1.1,2],['zubat',14,.3,6]),
- R(['grunt',6,1.2],['meowth',1,1,7])],
-floresta:[
- R(['rattata',10,.6]), R(['rattata',14,.45],['zubat',4,.7,3]), R(['zubat',12,.4],['ekans',6,.7,2]),
- R(['espiao',3,2],['rattata',12,.4,1]), R(['ekans',10,.5],['zubat',10,.35,3]),
- R(['espiao',5,1.4],['koffing',5,1,2]), R(['gastly',6,.9],['rattata',14,.35,2]),
- R(['koffing',10,.6],['grunt',4,1.5,3]), R(['gastly',10,.6],['espiao',5,1.2,2]),
- R(['grunt',6,1.2],['zubat',16,.28,2]), R(['elite',2,3.5],['koffing',10,.55,2]),
- R(['gastly',14,.45],['grunt',6,1.1,3]),
- R(['espiao',8,.9],['elite',3,2.5,2],['zubat',18,.25,4]),
- R(['grunt',10,.8],['gastly',12,.5,3],['koffing',12,.5,6]),
- R(['grunt',8,1],['meowthc',1,1,8])],
-montelua:[
- R(['zubat',12,.5]), R(['zubat',16,.38],['rattata',10,.45,3]),
- R(['geodude_r',4,1.6],['zubat',14,.35,2]), R(['ekans',12,.45],['geodude_r',5,1.4,3]),
- R(['geodude_r',8,1],['zubat',18,.3,2]), R(['koffing',10,.6],['grunt',4,1.6,3]),
- R(['grunt',6,1.2],['geodude_r',8,1,2]), R(['magnemite',8,.7],['zubat',20,.25,3]),
- R(['geodude_r',12,.8],['koffing',12,.55,3]), R(['elite',3,2.5],['magnemite',10,.6,2]),
- R(['grunt',10,.9],['gastly',10,.6,3]), R(['elite2',3,3],['espiao',6,1.1,2]),
- R(['magnemite',14,.5],['geodude_r',12,.8,3]), R(['grunt',12,.8],['elite',4,2.2,3]),
- R(['gastly',16,.4],['elite2',4,2.4,3],['zubat',22,.22,6]),
- R(['geodude_r',16,.6],['magnemite',16,.45,3]), R(['elite',6,1.8],['grunt',14,.7,3]),
- R(['elite2',6,1.8],['gastly',18,.4,3]),
- R(['meowth',1,1],['elite',5,2,4],['magnemite',18,.4,6]),
- R(['grunt',10,.9],['elite2',5,2,4],['onix',1,1,10])]
-};
+/* ---------- 7. ONDAS (geradas, nao escritas a mao) ----------
+   Todo mapa vai ate a onda 100. A dificuldade vem de tres coisas somadas:
+   tipos NOVOS entrando em cena, orcamento de ameaca crescendo, e HP
+   escalando so depois que o jogador ja teve tempo de montar defesa.       */
+const ONDAS_MAX=100;
+
+/* quando cada inimigo estreia */
+const CRONOGRAMA=[
+ {o:1,  t:'rattata'},    {o:3,  t:'zubat'},      {o:6,  t:'ekans'},
+ {o:10, t:'koffing'},    {o:14, t:'grunt'},      {o:22, t:'raticate'},
+ {o:26, t:'geodude_r'},  {o:30, t:'espiao'},     {o:34, t:'golbat'},
+ {o:42, t:'gastly'},     {o:38, t:'magnemite'},  {o:46, t:'arbok'},
+ {o:48, t:'elite'},      {o:52, t:'weezing'},    {o:56, t:'machoke_r'},
+ {o:60, t:'graveler_r'}, {o:64, t:'elite2'},     {o:68, t:'magneton'},
+ {o:74, t:'haunter_e'},  {o:82, t:'gengar_e'}
+];
+const CHEFES={25:'meowth', 50:'meowthc', 75:'onix', 100:'mewtwo'};
+const estreiaDe=t=>{ const c=CRONOGRAMA.find(x=>x.t===t); return c?c.o:1; };
+
+/* peso = quanto um inimigo "custa" do orcamento da onda */
+function pesoDe(t){
+  const d=INIMIGOS[t];
+  return Math.max(6, d.hp*.9*(d.resist?1.3:1) + d.roubo*3 + (d.camu?10:0) + (d.filhos?d.filhos.length*4:0));
+}
+/* HP so comeca a inflar depois da onda 25 — ate la a dificuldade e so
+   composicao. Evita o "muito dificil logo de cara". */
+function escalaOnda(n){ return 1 + Math.max(0,n-25)*.05; }
+
+/* gerador deterministico: a mesma onda do mesmo mapa e sempre igual,
+   entao da pra aprender a fase em vez de torcer */
+function rngSem(s){ s=s>>>0; return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296); }
+
+function gerarOnda(m,n){
+  const rnd=rngSem(n*7919 + m.semente);
+  const disp=CRONOGRAMA.filter(c=>c.o<=n).map(c=>c.t);
+  const out=[];
+  const chefe=CHEFES[n];
+  /* orcamento quase linear na onda: mantem a onda 1 mansa e ainda entrega
+     uma parede de gente na 100. Calibrado medindo HP total por onda. */
+  let orc=62 * Math.pow(n,1.08) * m.escala;
+  if(chefe){ out.push({t:chefe,n:1,g:1,e:9}); orc*=.55; }
+  const nG = n<8?1 : n<25?2 : n<55?3 : 4;
+  const usados=[];
+  for(let i=0;i<nG;i++){
+    /* vies pros tipos mais recentes, mas sem abandonar os antigos */
+    let idx=Math.min(disp.length-1, Math.floor(disp.length*(.28+rnd()*.72)));
+    while(usados.includes(idx)&&idx>0) idx--;
+    usados.push(idx);
+    const t=disp[idx];
+    /* peso^0.75 em vez de peso: inimigo forte ainda vem em menor numero,
+       mas a onda para de variar de 20 pra 4 so porque o sorteio mudou.
+       O teto segura as ondas iniciais de virarem enxurrada. */
+    let teto=Math.round(5+n*.5);
+    /* camuflado e binario: quem nao enxerga leva 100% de vazamento.
+       Por isso ele vem sempre em dose menor — e ameaca, nao sentenca. */
+    if(INIMIGOS[t].camu) teto=Math.max(3,Math.round(teto*.4));
+    let q=Math.max(3, Math.min(60, teto, Math.round((orc/nG)/Math.pow(pesoDe(t),.75))));
+    /* dose de apresentacao: tipo novo entra devagar nas primeiras 8 ondas */
+    const novo=n-estreiaDe(t);
+    if(novo<8) q=Math.max(2, Math.round(q*(.3+novo*.09)));
+    out.push({t, n:q,
+      g: Math.max(.15, 1.05 - n*.006),
+      e: i*Math.max(1.2, 4.5 - n*.03)});
+  }
+  return out;
+}
+/* prumo pra UI: quantas ondas ate o proximo inimigo novo */
+function proximaEstreia(n){
+  const c=CRONOGRAMA.find(x=>x.o>n);
+  return c ? {onda:c.o, nome:INIMIGOS[c.t].nome, spr:INIMIGOS[c.t].spr} : null;
+}
+function temCamuAte(n){
+  return CRONOGRAMA.some(c=>c.o<=n && INIMIGOS[c.t].camu);
+}
 
 /* ---------- 8. POKEBOLA (icone da moeda) ---------- */
 ARTE.pokebola={s:2,p:{'1':'#241818','2':'#e8453c','3':'#f2f2f5','4':'#ffffff','5':'#9aa0ac'},r:[
@@ -1467,9 +1875,12 @@ function salvar(){
 carregar();
 const possui=k=>!!SAVE.tem[k];
 const nPossui=()=>LISTA_POKE.filter(possui).length;
+const ONDA_LIBERA=25;   /* nao precisa zerar 100 ondas pra ver o proximo mapa */
+const recordeDe = id=>SAVE.recordes[id]||0;
 function mapaLiberado(i){
   if(i===0||TESTE) return true;
-  return !!SAVE.feitos[MAPAS[i-1].id];
+  const ant=MAPAS[i-1].id;
+  return recordeDe(ant)>=ONDA_LIBERA || !!SAVE.feitos[ant];
 }
 
 /* ---------- 10. ESTADO ---------- */
@@ -1507,6 +1918,10 @@ function chip(tipo){
   const T=TIPOS[tipo];
   return '<span class="chip" style="background:'+T.c+'22;color:'+T.c+';border-color:'+T.c+'66">'+T.n+'</span>';
 }
+function chipPapel(p){
+  const P=PAPEIS[p.papel]; if(!P) return '';
+  return '<span class="chip" title="'+P.d+'" style="background:'+P.c+'1e;color:'+P.c+';border-color:'+P.c+'55">'+P.n+'</span>';
+}
 function bolaHTML(n){ return '<span class="bolas"><img src="'+urlSpr('pokebola')+'">'+n+'</span>'; }
 
 /* --- menu --- */
@@ -1517,6 +1932,7 @@ function pintarMenu(){
   $('mMapas').textContent=f+'/'+MAPAS.length;
   $('mPo').textContent=SAVE.po;
   $('mFichas').textContent=SAVE.fichas;
+  $('vNum').textContent=VERSAO;
 }
 
 /* --- escolha do inicial --- */
@@ -1549,7 +1965,7 @@ function miniMapa(m){
   for(let i=1;i<m.caminho.length;i++) g.lineTo(m.caminho[i][0]*ex,m.caminho[i][1]*ey);
   g.stroke();
   g.strokeStyle=m.cor.c3; g.lineWidth=6; g.stroke();
-  for(const [k,x,y] of m.decor){
+  for(const [k,x,y] of (m.decor||[])){
     g.fillStyle=k==='cristal'?'#8a6fd6':k==='cogumelo'?'#c03a5a':k==='pedra'?'#6b7280':'#2f7a4a';
     g.fillRect(x*ex-2,y*ey-2,4,4);
   }
@@ -1558,16 +1974,20 @@ function miniMapa(m){
 function pintarMapas(){
   const el=$('gradeMapa'); el.innerHTML='';
   MAPAS.forEach((m,i)=>{
-    const lib=mapaLiberado(i), feito=!!SAVE.feitos[m.id];
+    const lib=mapaLiberado(i), feito=!!SAVE.feitos[m.id], rec=recordeDe(m.id);
+    const T=TIERS[m.tier];
     const d=document.createElement('div');
     d.className='mapa'+(lib?'':' trancado');
     d.innerHTML='<img src="'+miniMapa(m)+'">'+
       '<div class="corpo"><div class="l"><b>'+m.nome+'</b>'+
-      '<span class="dif d'+m.dific+'">'+m.dific+'</span></div>'+
+      '<span class="dif" style="background:'+T.bg+';color:'+T.c+'">'+T.n+'</span></div>'+
       '<div class="d">'+m.aviso+'</div>'+
-      '<div class="l2">'+RODADAS[m.id].length+' rodadas · '+bolaHTML(feito?Math.round(m.bolasFim*.4):m.bolasFim)+
-      (feito?' <span class="ok">✓ limpo</span>':' <span class="novo">1a vez</span>')+'</div></div>'+
-      (lib?'':'<div class="cadeado">Limpe '+MAPAS[i-1].nome+' primeiro</div>');
+      '<div class="l2">'+ONDAS_MAX+' ondas · '+FORMAS[m.forma]+' · '+m.limite+' unidades<br>'+
+      bolaHTML(feito?Math.round(m.bolasFim*.4):m.bolasFim)+
+      (feito?' <span class="ok">✓ zerado</span>'
+           :rec?' <span class="novo">recorde: onda '+rec+'</span>'
+           :' <span class="novo">1a vez</span>')+'</div></div>'+
+      (lib?'':'<div class="cadeado">Chegue na onda '+ONDA_LIBERA+' de '+MAPAS[i-1].nome+'</div>');
     if(lib) d.onclick=()=>{ mapaEscolhido=i; irPara('tEquipe'); };
     el.appendChild(d);
   });
@@ -1575,7 +1995,7 @@ function pintarMapas(){
 
 /* --- selecao de equipe --- */
 function temCamu(m){
-  return RODADAS[m.id].some(r=>r.some(g=>INIMIGOS[g.t].camu));
+  return true; /* todo mapa tem camuflado a partir da onda 20 */
 }
 function pintarEquipe(){
   const m=MAPAS[mapaEscolhido];
@@ -1589,9 +2009,9 @@ function pintarEquipe(){
     const p=POKE[k], dentro=equipe.includes(k);
     const d=document.createElement('button');
     d.className='eqc'+(dentro?' dentro':'');
-    d.innerHTML='<img src="'+urlSpr(p.spr)+'"><div class="n">'+p.nome+'</div>'+chip(p.base.ataque)+
-      (p.base.detecta?'<div class="faro">FARO</div>':'')+
-      '<div class="cst">'+p.custo+'</div>';
+    d.innerHTML='<img src="'+urlPoke(k)+'"><div class="n">'+p.nome+'</div>'+chip(p.base.ataque)+
+      chipPapel(p)+(p.base.detecta?'<div class="faro">FARO</div>':'')+
+      '<div class="cst">'+custoDe(k)+'</div>';
     d.onclick=()=>{
       if(dentro) equipe=equipe.filter(x=>x!==k);
       else if(equipe.length<6) equipe.push(k);
@@ -1609,9 +2029,9 @@ function pintarEquipe(){
 /* --- safari (gacha mirado com pity) --- */
 let alvoSafari=null;
 function chanceDe(k){
-  const t=SAVE.tiros[k]||0;
+  const t=SAVE.tiros[k]||0, P=pityDe(k);
   let ch=RARIDADE[POKE[k].rar].ch;
-  if(t>PITY/2) ch += (t-PITY/2)/(PITY/2)*.35;
+  if(t>P/2) ch += (t-P/2)/(P/2)*.35;   /* a rampa so comeca na metade do pity */
   return Math.min(1,ch);
 }
 function pintarSafari(){
@@ -1625,8 +2045,8 @@ function pintarSafari(){
       '<div class="n">'+(tem?p.nome:'???')+'</div>'+
       '<div class="rar" style="color:'+r.c+'">'+r.n+'</div>'+
       (tem?'<div class="capt">✓ na equipe</div>'
-         :'<div class="pity"><i style="width:'+Math.min(100,t/PITY*100)+'%"></i></div>'+
-          '<div class="pt">'+t+'/'+PITY+' tiros · '+Math.round(chanceDe(k)*100)+'%</div>');
+         :'<div class="pity"><i style="width:'+Math.min(100,t/pityDe(k)*100)+'%"></i></div>'+
+          '<div class="pt">'+t+'/'+pityDe(k)+' tiros · '+Math.round(chanceDe(k)*100)+'%</div>');
     if(!tem) d.onclick=()=>{ alvoSafari=k; pintarSafari(); };
     el.appendChild(d);
   }
@@ -1644,7 +2064,7 @@ function atirar(k,n){
     if(SAVE.bolas<1||possui(k)) break;
     SAVE.bolas--; gastas++;
     const t=(SAVE.tiros[k]||0)+1; SAVE.tiros[k]=t;
-    if(t>=PITY || Math.random()<chanceDe(k)){ SAVE.tem[k]=true; capturou=true; break; }
+    if(t>=pityDe(k) || Math.random()<chanceDe(k)){ SAVE.tem[k]=true; capturou=true; break; }
   }
   salvar();
   const c=document.querySelector('.sfc.alvo');
@@ -1745,6 +2165,23 @@ function distCaminho(x,y){
   }
   return m;
 }
+/* Mapas com `decorAuto` espalham decoracao sozinhos, longe do caminho.
+   Poupa posicionar 26 arvores na mao — e fica igual toda vez (semente fixa). */
+function decorDe(m){
+  if(m.decor) return m.decor;
+  if(m._decor) return m._decor;
+  const out=[], rnd=rngSem(m.semente*31+7);
+  let tent=0;
+  while(out.length<m.decorAuto && tent<3000){
+    tent++;
+    const x=30+rnd()*(LARG-60), y=30+rnd()*(ALT-60);
+    if(distCaminho(x,y)<46) continue;
+    if(dist(x,y,m.centro[0],m.centro[1])<70) continue;
+    if(out.some(d=>dist(x,y,d[1],d[2])<52)) continue;
+    out.push([m.decorTipos[Math.floor(rnd()*m.decorTipos.length)],Math.round(x),Math.round(y)]);
+  }
+  return (m._decor=out);
+}
 function pintarFundo(m){
   const C=document.createElement('canvas'); C.width=LARG; C.height=ALT;
   const g=C.getContext('2d'); g.imageSmoothingEnabled=false;
@@ -1772,7 +2209,7 @@ function pintarFundo(m){
     g.fillStyle=rnd()>.5?k.p1:k.p2;
     g.fillRect(Math.floor(p.x-p.dy*off),Math.floor(p.y+p.dx*off),2,2);
   }
-  for(const [nome,x,y] of m.decor){
+  for(const [nome,x,y] of decorDe(m)){
     const s=SPR[nome];
     g.fillStyle='rgba(0,0,0,.18)';
     g.beginPath(); g.ellipse(x,y+s.height/2-4,s.width*.34,5,0,0,6.283); g.fill();
@@ -1808,25 +2245,28 @@ function iniciarPartida(){
   $('bVel').textContent='▸ 1x'; $('bVel').classList.remove('on');
   $('cAuto').checked=autoRodada;
   $('jMapa').textContent=mapa.nome;
-  $('hTot').textContent=RODADAS[mapa.id].length;
+  $('hTot').textContent=ONDAS_MAX;
   irPara('tJogo');
   montarLoja(); atualizarUI();
 }
 function criarInimigo(tipo,d0){
   const def=INIMIGOS[tipo], p=posEm(d0);
-  const hp=Math.round(def.hp*(def.chefe?1:mapa.hpMult));
-  inimigos.push({id:idSeq++,tipo,def,hp,hpMax:hp,d:d0,x:p.x,y:p.y,
+  const esc=escalaOnda(rodada);
+  const hp=Math.round(def.hp*mapa.hpMult*esc);
+  /* recompensa acompanha o inflar do HP, senao onda 80 paga como onda 20 */
+  const rec=Math.round(def.rec*(1+(esc-1)*.55));
+  inimigos.push({id:idSeq++,tipo,def,hp,hpMax:hp,rec,d:d0,x:p.x,y:p.y,
     lentoM:1,lentoT:0,bob:Math.random()*6.28,brilho:0});
 }
 function iniciarRodada(){
   if(emOnda||fim||!jogando) return;
   rodada++;
   fila=[];
-  for(const g of RODADAS[mapa.id][rodada-1])
+  for(const g of gerarOnda(mapa,rodada))
     for(let i=0;i<g.n;i++) fila.push({t:g.t,q:(g.e||0)+i*g.g});
   fila.sort((a,b)=>a.q-b.q);
   tOnda=0; emOnda=true;
-  const ult=rodada===RODADAS[mapa.id].length;
+  const ult=rodada===ONDAS_MAX;
   if(ult) avisar('PREPARE-SE PARA ENCRENCA!','#ff7d75');
   else avisar('Rodada '+rodada,'#7fb4ff');
   som(520,.08,'square',.05);
@@ -1834,13 +2274,25 @@ function iniciarRodada(){
 }
 function fimRodada(){
   emOnda=false; esperaAuto=2.5;
-  const bonus=100+rodada*18;
+  const bonus=Math.round(120+rodada*rodada*1.1);
   dinheiro+=bonus;
-  if(!TESTE){ bolasGanhas+=mapa.bolasRod; if(rodada%5===0) fichasGanhas++; }
+  if(!TESTE){
+    bolasGanhas+=mapa.bolasRod;
+    if(rodada%5===0) fichasGanhas++;
+    /* o recorde de onda e o que libera o proximo mapa — grava na hora,
+       senao morrer na onda 40 nao valeria nada */
+    if(rodada>recordeDe(mapa.id)){ SAVE.recordes[mapa.id]=rodada; salvar(); }
+  }
   flutuar(LARG/2,90,'+'+bonus,'#ffcb05',1.4);
   som(660,.09,'triangle',.05); setTimeout(()=>som(880,.12,'triangle',.05),90);
-  if(rodada>=RODADAS[mapa.id].length){ vitoria(); return; }
+  if(rodada>=ONDAS_MAX){ vitoria(); return; }
   atualizarUI();
+}
+/* dano continuo: queimadura, veneno. Tica a cada 0,25s em vez de todo
+   quadro — mesmo resultado, 1/15 das chamadas. */
+function aplicarDot(e,dano,dur,ataque,torre){
+  if(e.dot && e.dot.dano>=dano){ e.dot.restante=Math.max(e.dot.restante,dur); return; }
+  e.dot={dano,restante:dur,ataque,torre}; e.dotT=.25;
 }
 function aplicarDano(e,dano,ataque,torre){
   const m = ataque ? efic(ataque,e.def.tipos) : 1;
@@ -1859,8 +2311,8 @@ function aplicarDano(e,dano,ataque,torre){
 }
 function derrotar(e,torre){
   e.morto=true; pops++;
-  dinheiro+=e.def.rec;
-  if(torre) xpPartida[torre.k]=(xpPartida[torre.k]||0)+e.def.rec;
+  dinheiro+=e.rec||e.def.rec;
+  if(torre) xpPartida[torre.k]=(xpPartida[torre.k]||0)+(e.rec||e.def.rec);
   decolar(e.x,e.y,e.def.chefe?2.4:1);
   if(e.def.chefe){ flutuar(e.x,e.y-30,'A EQUIPE ROCKET DECOLOU DE NOVO!','#ffcb05',2.4); somDecolagem(); poGanho+=2; }
   else som(700+Math.random()*260,.07,'square',.03);
@@ -1907,7 +2359,7 @@ function dispararProjetil(t,alvo){
   const a=Math.atan2(alvo.y-t.y,alvo.x-t.x);
   projeteis.push({x:t.x,y:t.y,vx:Math.cos(a)*t.s.velproj,vy:Math.sin(a)*t.s.velproj,
     dano:t.s.dano,pierce:t.s.pierce,vida:1.8,tipo:t.s.proj,ataque:t.s.ataque,ang:a,
-    area:t.s.area||0,lento:t.s.lento,lentoT:t.s.lentoT,detecta:!!t.s.detecta,torre:t,hits:new Set(),
+    area:t.s.area||0,lento:t.s.lento,lentoT:t.s.lentoT,dot:t.s.dot,detecta:!!t.s.detecta,torre:t,hits:new Set(),
     r:t.s.proj==='vinha'?9:t.s.proj==='psi'?12:7});
   som(t.s.proj==='vinha'?300:t.s.proj==='psi'?620:480,.04,'square',.016);
 }
@@ -1918,7 +2370,7 @@ function socar(t){
     if(e.morto||n>=t.s.pierce) continue;
     if(e.def.camu&&!t.s.detecta) continue;
     if(dist(t.x,t.y,e.x,e.y)>alcance) continue;
-    aplicarDano(e,t.s.dano,t.s.ataque,t); n++;
+    aplicarDano(e,t.s.dano,t.s.ataque,t); if(t.s.dot) aplicarDot(e,t.s.dot.dano,t.s.dot.dur,t.s.ataque,t); n++;
     faisca(e.x,e.y,'soco');
   }
   if(n){ socos.push({x:t.x,y:t.y,r:alcance,t:.16}); som(200,.06,'square',.03); }
@@ -1962,6 +2414,15 @@ function atualizar(dt){
     if(e.morto) continue;
     if(e.brilho>0) e.brilho-=dt;
     if(e.lentoT>0){ e.lentoT-=dt; if(e.lentoT<=0) e.lentoM=1; }
+    if(e.dot){
+      e.dotT-=dt;
+      if(e.dotT<=0){
+        e.dotT=.25; e.dot.restante-=.25;
+        aplicarDano(e,e.dot.dano*.25,e.dot.ataque,e.dot.torre);
+        if(e.morto) continue;
+        if(e.dot.restante<=0) e.dot=null;
+      }
+    }
     e.d+=e.def.vel*e.lentoM*dt;
     if(e.d>=TOTAL){ vazar(e); continue; }
     const p=posEm(e.d); e.x=p.x; e.y=p.y; e.dx=p.dx; e.dy=p.dy;
@@ -1979,6 +2440,7 @@ function atualizar(dt){
         p.hits.add(e.id); p.pierce--;
         aplicarDano(e,p.dano,p.ataque,p.torre);
         if(p.lento&&e.lentoM>p.lento){ e.lentoM=p.lento; e.lentoT=p.lentoT; }
+        if(p.dot) aplicarDot(e,p.dot.dano,p.dot.dur,p.ataque,p.torre);
         faisca(p.x,p.y,p.tipo);
         if(p.pierce<=0) p.vida=0;
       }
@@ -1988,7 +2450,7 @@ function atualizar(dt){
   for(const r of raios) r.t-=dt;
   for(const s of socos) s.t-=dt;
   for(const f of flutuantes){ f.t-=dt; f.y-=22*dt; }
-  if(!emOnda&&autoRodada&&!fim&&jogando&&rodada<RODADAS[mapa.id].length){
+  if(!emOnda&&autoRodada&&!fim&&jogando&&rodada<ONDAS_MAX){
     esperaAuto-=dt;
     if(esperaAuto<=0) iniciarRodada();
   }
@@ -2031,8 +2493,21 @@ function desenhar(){
     circuloAlcance(mouse.x,mouse.y,POKE[comprando].base.alcance,ok?'#4cc76a':'#e8453c');
   }
 
+  /* alcance da aura de quem buffa, pra dar pra posicionar direito */
+  for(const t of torres){
+    if(!t.puro.aura) continue;
+    G.save();
+    G.strokeStyle='rgba(255,203,5,.22)'; G.lineWidth=2; G.setLineDash([3,7]);
+    G.lineDashOffset=performance.now()/220;
+    G.beginPath(); G.arc(t.x,t.y,t.puro.aura.r,0,6.283); G.stroke();
+    G.restore();
+  }
   for(const t of torres){
     sombra(t.x,t.y+SPR[t.spr].height/2-4,SPR[t.spr].width*.3);
+    if(t.buffada){
+      G.fillStyle='rgba(255,203,5,.16)';
+      G.beginPath(); G.arc(t.x,t.y,20,0,6.283); G.fill();
+    }
     sprite(t.spr,t.x,t.y-2,t.ang>1.571||t.ang<-1.571,t.flash>0?1+t.flash*.5:1,t.shiny);
     if(t.shiny&&Math.random()<.05)
       particulas.push({tipo:'brilho',x:t.x+(Math.random()-.5)*26,y:t.y+(Math.random()-.5)*26,
@@ -2062,6 +2537,13 @@ function desenhar(){
       G.fillStyle='rgba(120,220,180,.28)';
       G.beginPath(); G.arc(e.x,e.y,e.def.raio+3,0,6.283); G.fill();
     }
+    if(e.dot){
+      const q=e.dot.ataque==='veneno'?'168,111,214':'255,122,24';
+      G.fillStyle='rgba('+q+',.3)';
+      G.beginPath(); G.arc(e.x,e.y,e.def.raio+2,0,6.283); G.fill();
+      if(Math.random()<.25) particulas.push({tipo:'brilho',x:e.x+(Math.random()-.5)*14,
+        y:e.y-6,vx:0,vy:-34,g:0,t:.34,max:.34,r:2.5,cor:e.dot.ataque==='veneno'?'#c08ae8':'#ffb04a'});
+    }
     if(e.hp<e.hpMax){
       const w=Math.max(20,e.def.raio*2), h=4, x=e.x-w/2, y=e.y-s.height/2-7;
       G.fillStyle='rgba(0,0,0,.55)'; G.fillRect(x-1,y-1,w+2,h+2);
@@ -2090,6 +2572,15 @@ function desenhar(){
     } else if(p.tipo==='dragao'){
       G.fillStyle='#7038f8'; G.beginPath(); G.arc(p.x,p.y,8,0,6.283); G.fill();
       G.fillStyle='#c0a8f0'; G.beginPath(); G.arc(p.x,p.y,4,0,6.283); G.fill();
+    } else if(p.tipo==='nota'){
+      G.save(); G.globalAlpha=.9; G.fillStyle='#ffd0e4';
+      G.beginPath(); G.arc(p.x,p.y+3,4,0,6.283); G.fill();
+      G.fillRect(p.x+3,p.y-8,2,11);
+      G.fillRect(p.x+3,p.y-8,6,3);
+      G.restore();
+    } else if(p.tipo==='pedrada'){
+      G.fillStyle='#8a5a38'; G.fillRect(p.x-5,p.y-5,10,10);
+      G.fillStyle='#b08050'; G.fillRect(p.x-5,p.y-5,6,6);
     } else if(p.tipo==='invest'){
       G.fillStyle='#f5e8d0'; G.beginPath(); G.arc(p.x,p.y,5,0,6.283); G.fill();
       G.fillStyle='#c08850'; G.beginPath(); G.arc(p.x-p.vx*.006,p.y-p.vy*.006,3,0,6.283); G.fill();
@@ -2191,12 +2682,31 @@ function posicaoValida(x,y){
   for(const t of torres) if(dist(x,y,t.x,t.y)<34) return false;
   return true;
 }
+/* `puro` = o que a torre e sozinha (base + arvore + evolucoes).
+   `s`    = o que ela e em campo, ja com as auras dos vizinhos.
+   Guardar os dois separados evita buff em cima de buff a cada recalculo. */
+function recalcularAuras(){
+  for(const t of torres) t.s=Object.assign({},t.puro);
+  for(const f of torres){
+    const a=f.puro.aura; if(!a) continue;
+    for(const t of torres){
+      if(t===f) continue;
+      if(dist(f.x,f.y,t.x,t.y)>a.r) continue;
+      if(a.dano)    t.s.dano   = +(t.s.dano*a.dano).toFixed(2);
+      if(a.cad)     t.s.cad    = t.s.cad*a.cad;
+      if(a.alcance) t.s.alcance= Math.round(t.s.alcance+a.alcance);
+      if(a.pierce)  t.s.pierce = (t.s.pierce||1)+a.pierce;
+      t.buffada=true;
+    }
+  }
+}
 function colocar(k,x,y){
   const def=POKE[k], s=Object.assign({},def.base);
   aplicarArvore(k,s);
   const c=custoDe(k);
-  torres.push({k,def,x,y,s,spr:def.spr,shiny:!!SAVE.shiny[k],
+  torres.push({k,def,x,y,puro:s,s:Object.assign({},s),spr:def.spr,shiny:!!SAVE.shiny[k],
     mira:'primeiro',recarga:0,flash:0,ang:0,nivel:0,gasto:c});
+  recalcularAuras();
   dinheiro-=c;
   som(560,.07,'triangle',.05);
   for(let i=0;i<8;i++){const a=Math.random()*6.283;
@@ -2210,7 +2720,7 @@ function aplicarUp(t,up){
     som(180,.08,'square',.03); return;
   }
   dinheiro-=c; t.gasto+=c;
-  up.f(t.s);
+  up.f(t.puro); recalcularAuras();
   if(up.evo){
     t.spr=up.evo;
     avisar('O que? '+(t.nome||t.def.nome)+' esta evoluindo!','#a86fd6');
@@ -2230,7 +2740,7 @@ function comprarUpgrade(t){
 }
 function vender(t){
   dinheiro+=Math.floor(t.gasto*.7);
-  torres=torres.filter(x=>x!==t);
+  torres=torres.filter(x=>x!==t); recalcularAuras();
   sel=null; som(280,.1,'triangle',.04); atualizarUI();
 }
 
@@ -2275,7 +2785,7 @@ function atualizarHUD(){
 function atualizarUI(){
   atualizarHUD();
   const pv=$('prev'); pv.innerHTML='';
-  const prox=RODADAS[mapa.id][rodada];
+  const prox=rodada<ONDAS_MAX?gerarOnda(mapa,rodada+1):null;
   if(prox){
     const cont={};
     for(const g of prox) cont[g.t]=(cont[g.t]||0)+g.n;
@@ -2287,11 +2797,21 @@ function atualizarUI(){
       pv.appendChild(d);
     }
   } else pv.innerHTML='<b style="color:#8b9ab4;font-size:11px">Mapa limpo.</b>';
+  /* avisa quem estreia adiante — camuflado sem aviso e sacanagem */
+  const est=proximaEstreia(rodada);
+  const av=$('estreia');
+  if(est && est.onda-rodada<=6){
+    const D=INIMIGOS[CRONOGRAMA.find(c=>c.o===est.onda).t];
+    av.style.display='';
+    av.className='estreia'+(D.camu?' camu':'');
+    av.innerHTML='<img src="'+urlSpr(est.spr)+'">estreia na onda <b>'+est.onda+'</b>: '+est.nome+
+      (D.camu?'<br><b>CAMUFLADO</b> — sem faro no time, passa direto':'');
+  } else av.style.display='none';
 
   $('cxTorre').style.display=sel?'block':'none';
   $('cxLoja').style.display=sel?'none':'block';
   if(!sel) return;
-  $('tnome').innerHTML=(sel.nome||sel.def.nome)+' '+chip(sel.s.ataque)+(sel.s.detecta?'<span class="chip faro">FARO</span>':'');
+  $('tnome').innerHTML=(sel.nome||sel.def.nome)+' '+chip(sel.s.ataque)+chipPapel(sel.def)+(sel.s.detecta?'<span class="chip faro">FARO</span>':'');
   const u=$('ups'); u.innerHTML='';
   const st=document.createElement('div');
   st.className='up feito'; st.style.cursor='default';
@@ -2390,8 +2910,8 @@ function vitoria(){
     fichasGanhas+=3; if(primeira) poGanho+=5;
     SAVE.feitos[mapa.id]=true;
     SAVE.bolas+=bolasGanhas;
-    const rec=SAVE.recordes[mapa.id]||0;
-    if(pops>rec) SAVE.recordes[mapa.id]=pops;
+
+    SAVE.recordes[mapa.id]=ONDAS_MAX;
     comitarGanhos();
     salvar();
   }

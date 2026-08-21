@@ -34,6 +34,8 @@ Encheu a rota de um tipo só? A onda 12 te ensina.
 
 **Só uma forma final de cada em campo.** Pode ter seis Charmander e seis Charmeleon, mas **um** Charizard. A terceira evolução é o ápice, e é escassa.
 
+**Cada Pokémon tem um papel declarado** — Atirador, Massa, Área, Contínuo, Controle, Suporte, Cadeia, Perfurante, Farejador. Suporte não mata: o Jigglypuff acelera quem está em volta, a Chansey aumenta o dano dos vizinhos. Contínuo queima ou envenena, e o dano segue correndo depois do tiro.
+
 ## Progressão
 
 - **Pokébola** — captura no Safári. Você escolhe o alvo e joga bolas: a chance sobe conforme insiste e no tiro 100 é garantido. Nada é desperdiçado.
@@ -41,7 +43,9 @@ Encheu a rota de um tipo só? A onda 12 te ensina.
 - **Pó de Estrela** — gacha de **shiny**. Sem pity, chance baixíssima. É troféu, não poder.
 - **Ficha do Cassino** — banner de **TM** que troca toda semana. Shadow Ball num Gengar, Earthquake num Machamp.
 
-Três mapas, liberados em ordem: **Rota 1** → **Floresta de Viridian** (camuflagem) → **Monte Lua** (Pedra/Terra).
+**Seis mapas, 100 ondas cada**, em quatro níveis: Noob, Fácil, "Até que vai" e "Tu quer é desafio e n sabe pedir".
+
+A geometria é a dificuldade: **espiral** é fácil (uma torre no miolo cobre volta após volta), **curvas** é médio, e **corredor longo e estreito** é difícil — caminho enorme e quase nenhum chão pra construir.
 
 ## Detalhes técnicos
 
