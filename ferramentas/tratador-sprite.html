@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Tratador de Sprite</title>
+<style>
+:root{--bg:#0c1018;--painel:#151c29;--painel2:#1e2739;--borda:#2c3850;--txt:#e6edf7;
+  --fraco:#8b9ab4;--ouro:#ffcb05;--verde:#4cc76a;--roxo:#a86fd6}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans-serif;
+  margin:0;padding:22px;line-height:1.5}
+.wrap{max-width:1150px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+p.sub{color:var(--fraco);font-size:13.5px;margin:0 0 18px;max-width:760px}
+#solta{border:2px dashed var(--borda);border-radius:14px;padding:34px;text-align:center;
+  color:var(--fraco);transition:.15s;cursor:pointer;background:var(--painel)}
+#solta.ativo{border-color:var(--ouro);background:#1c1a10;color:var(--txt)}
+#solta b{display:block;font-size:16px;color:var(--txt);margin-bottom:5px}
+#solta small{font-size:12px}
+.ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px;margin:18px 0}
+.ctrl label{background:var(--painel);border:1px solid var(--borda);border-radius:10px;padding:10px 13px;display:block}
+.ctrl b{display:block;font-size:10.5px;letter-spacing:1.6px;color:var(--fraco);
+  text-transform:uppercase;margin-bottom:7px;font-weight:700}
+.ctrl input[type=range]{width:100%;accent-color:var(--ouro)}
+.ctrl select{width:100%;background:#0e1520;border:1px solid var(--borda);color:var(--txt);
+  border-radius:7px;padding:6px 8px;font-family:inherit;font-size:13px}
+.ctrl .val{font-family:ui-monospace,monospace;font-size:12px;color:var(--ouro);float:right}
+.paineis{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;margin-top:8px}
+.card{background:var(--painel);border:1px solid var(--borda);border-radius:12px;padding:12px;text-align:center}
+.card h3{font-size:11px;letter-spacing:1.8px;color:var(--fraco);text-transform:uppercase;margin:0 0 9px;font-weight:700}
+canvas,.card img{image-rendering:pixelated;border-radius:7px;display:block;margin:0 auto}
+.xadrez{background-image:linear-gradient(45deg,#232c3d 25%,transparent 25%),
+  linear-gradient(-45deg,#232c3d 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#232c3d 75%),
+  linear-gradient(-45deg,transparent 75%,#232c3d 75%);
+  background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0px;background-color:#1a2130}
+.grama{background:#4e9a5c}
+.card small{display:block;font-size:11px;color:var(--fraco);margin-top:7px}
+.btn{background:var(--painel2);border:1px solid var(--borda);color:var(--txt);border-radius:9px;
+  padding:9px 18px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:.12s}
+.btn:hover{background:#2a3550;border-color:#41527a}
+.btn.ouro{background:var(--ouro);border-color:#ffe066;color:#241a00}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.acoes{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+#info{font-size:12px;color:var(--fraco);font-family:ui-monospace,monospace}
+.paleta{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:9px}
+.paleta i{width:15px;height:15px;border-radius:3px;border:1px solid #0006;display:block}
+</style></head>
+<body><div class="wrap">
+
+<h1>Tratador de Sprite</h1>
+<p class="sub">Transforma imagem de gerador de IA em pixel art de verdade: acha a grade, tira o fundo,
+reduz sem borrar e corta a paleta. <b>Cole com Ctrl+V</b>, arraste o arquivo ou clique pra escolher.</p>
+
+<div id="solta">
+  <b>Cole aqui com Ctrl+V</b>
+  <small>ou arraste a imagem &nbsp;·&nbsp; ou clique pra procurar</small>
+  <input type="file" id="arq" accept="image/*" hidden>
+</div>
+
+<div class="ctrl">
+  <label><b>Tamanho final <span class="val" id="vTam">64</span></b>
+    <select id="tam">
+      <option value="32">32 x 32</option>
+      <option value="48">48 x 48</option>
+      <option value="64" selected>64 x 64</option>
+      <option value="96">96 x 96</option>
+    </select></label>
+  <label><b>Cores <span class="val" id="vCor">14</span></b>
+    <input type="range" id="cor" min="6" max="32" value="14"></label>
+  <label><b>Tolerancia do fundo <span class="val" id="vTol">42</span></b>
+    <input type="range" id="tol" min="5" max="120" value="42"></label>
+  <label><b>Cortar borda % <span class="val" id="vMar">6</span></b>
+    <input type="range" id="mar" min="0" max="20" value="6"></label>
+  <label><b>Preservar acentos <span class="val" id="vAce">60</span></b>
+    <input type="range" id="ace" min="0" max="200" value="60"></label>
+</div>
+
+<div class="paineis">
+  <div class="card"><h3>Original</h3><canvas id="cOrig" width="300" height="300"></canvas>
+    <small id="sOrig">—</small></div>
+  <div class="card"><h3>Tratado (ampliado)</h3><canvas id="cAmp" class="xadrez" width="300" height="300"></canvas>
+    <small id="sAmp">—</small><div class="paleta" id="pal"></div></div>
+  <div class="card"><h3>No jogo</h3><canvas id="cJogo" class="grama" width="140" height="140"></canvas>
+    <small>tamanho real sobre a grama</small></div>
+</div>
+
+<div class="acoes">
+  <button class="btn ouro" id="baixar" disabled>Baixar PNG</button>
+  <button class="btn" id="copiar" disabled>Copiar como base64</button>
+  <span id="info"></span>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let imgOrig=null, resultado=null, paleta=[];
+
+/* ---------- entrada ---------- */
+const solta=$('solta');
+solta.onclick=()=>$('arq').click();
+$('arq').onchange=e=>{ if(e.target.files[0]) carregar(e.target.files[0]); };
+solta.addEventListener('dragover',e=>{e.preventDefault();solta.classList.add('ativo');});
+solta.addEventListener('dragleave',()=>solta.classList.remove('ativo'));
+solta.addEventListener('drop',e=>{e.preventDefault();solta.classList.remove('ativo');
+  const f=[...e.dataTransfer.files].find(f=>f.type.startsWith('image/')); if(f) carregar(f);});
+window.addEventListener('paste',e=>{
+  for(const it of e.clipboardData.items) if(it.type.startsWith('image/')){ carregar(it.getAsFile()); break; }
+});
+function carregar(file){
+  const r=new FileReader();
+  r.onload=()=>{ const i=new Image(); i.onload=()=>usarImagem(i); i.src=r.result; };
+  r.readAsDataURL(file);
+}
+/* ponto de entrada unico — aceita Image ou Canvas. Fica global de proposito,
+   pra dar pra testar o pipeline sem depender de arquivo. */
+function usarImagem(src){ imgOrig=src; processar(); return resultado; }
+function _ultimo(){ return {resultado,paleta}; }
+
+/* ---------- 1. achar o tamanho do bloco de pixel ----------
+   A imagem de IA finge ser pixel art: cada "pixel" e um bloco de N reais.
+   Testo varias grades e fico com a que tem menos variacao dentro dos blocos. */
+function acharGrade(d,w,h){
+  /* Onde termina um bloco existe uma borda: a coluna x e bem diferente da x+1.
+     Somando essas diferencas da um perfil com picos regulares — e o espaco
+     entre os picos E o tamanho do bloco. */
+  /* Em arte escalada, cada bloco vira uma sequencia de pixels iguais na
+     horizontal. Meco o comprimento dessas sequencias: o tamanho do bloco
+     e o comprimento que mais se repete. Fundo liso nao gera sequencia,
+     entao nao atrapalha. */
+  /* tolerancia adaptativa: mede o ruido tipico entre vizinhos e exige que a
+     transicao seja bem maior que ele. Imagem limpa usa o piso; imagem
+     ruidosa de gerador sobe o limiar sozinha. */
+  const amostras=[];
+  for(let y=2;y<h-2;y+=17) for(let x=2;x<w-2;x+=13){
+    const i=(y*w+x)*4, j=(y*w+x+1)*4;
+    amostras.push(Math.abs(d[i]-d[j])+Math.abs(d[i+1]-d[j+1])+Math.abs(d[i+2]-d[j+2]));
+  }
+  amostras.sort((a,b)=>a-b);
+  const ruido=amostras[Math.floor(amostras.length*0.5)]||0;
+  const runs={}, tol=Math.max(26, ruido*3.5);
+  const varre=(pegar)=>{
+    for(let a=0;a<(pegar==='h'?h:w);a+=4){
+      let ini=0;
+      const lim=(pegar==='h'?w:h);
+      for(let b=1;b<lim;b++){
+        const i=(pegar==='h'?(a*w+b):(b*w+a))*4;
+        const j=(pegar==='h'?(a*w+b-1):((b-1)*w+a))*4;
+        const dif=Math.abs(d[i]-d[j])+Math.abs(d[i+1]-d[j+1])+Math.abs(d[i+2]-d[j+2]);
+        if(dif>tol){ const L=b-ini; if(L>=2&&L<=96) runs[L]=(runs[L]||0)+1; ini=b; }
+      }
+    }
+  };
+  varre('h'); varre('v');
+  const lista=Object.entries(runs).map(([L,n])=>[+L,n]);
+  if(!lista.length) return {bloco:1,logico:w};
+  const pico=Math.max(...lista.map(l=>l[1]));
+  /* o verdadeiro e o MENOR comprimento frequente: blocos vizinhos de mesma
+     cor geram runs de 2x e 3x, que tambem sao frequentes mas sao multiplos */
+  const cands=lista.filter(l=>l[1]>=pico*0.30).sort((a,b)=>a[0]-b[0]);
+  const bloco=cands[0][0];
+  return {bloco, logico:Math.round(w/bloco), forca:+(pico/lista.length).toFixed(1)};
+}
+
+/* ---------- 2. reduzir amostrando a cor dominante de cada bloco ---------- */
+function reduzir(d,w,h,n,acento){
+  const out=new Uint8ClampedArray(n*n*4);
+  const bw=w/n, bh=h/n;
+  /* media geral, pra saber o que "destoa" */
+  let mr=0,mg=0,mb=0,mc=0;
+  for(let i=0;i<d.length;i+=64){ mr+=d[i];mg+=d[i+1];mb+=d[i+2];mc++; }
+  mr/=mc; mg/=mc; mb/=mc;
+  for(let by=0;by<n;by++) for(let bx=0;bx<n;bx++){
+    const x0=Math.floor(bx*bw), y0=Math.floor(by*bh);
+    const x1=Math.max(x0+1,Math.floor((bx+1)*bw)), y1=Math.max(y0+1,Math.floor((by+1)*bh));
+    const grupos={};
+    for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){
+      const i=(y*w+x)*4;
+      const k=((d[i]>>3)<<10)|((d[i+1]>>3)<<5)|(d[i+2]>>3);
+      const g=grupos[k]=grupos[k]||{n:0,r:d[i],g:d[i+1],b:d[i+2]};
+      g.n++;
+    }
+    /* Peso = quantidade, mas cor que destoa da media da imagem ganha um
+       empurrao. Sem isso a rachadura de lava dentro de um bloco escuro
+       sempre perde pro escuro, e o bicho fica sem os detalhes que o definem. */
+    let melhor=null, nota=-1;
+    for(const k in grupos){
+      const g=grupos[k];
+      const dist=Math.sqrt((g.r-mr)**2+(g.g-mg)**2+(g.b-mb)**2);
+      const peso=g.n*(1+ (acento/100)*(dist/60));
+      if(peso>nota){ nota=peso; melhor=g; }
+    }
+    const o=(by*n+bx)*4;
+    out[o]=melhor.r; out[o+1]=melhor.g; out[o+2]=melhor.b; out[o+3]=255;
+  }
+  return out;
+}
+
+/* ---------- 3. tirar o fundo por preenchimento a partir das bordas ----------
+   Melhor que "apagar tudo que e cinza": nao come partes internas do bicho
+   que por acaso tenham cor parecida com o fundo. */
+function tirarFundo(px,n,tol){
+  /* cor de referencia = cor mais comum nas quatro bordas */
+  const conta={};
+  const amostra=(x,y)=>{
+    const i=(y*n+x)*4;
+    const k=((px[i]>>3)<<10)|((px[i+1]>>3)<<5)|(px[i+2]>>3);
+    const c=conta[k]=conta[k]||{n:0,r:0,g:0,b:0};
+    c.n++; c.r+=px[i]; c.g+=px[i+1]; c.b+=px[i+2];
+  };
+  for(let i=0;i<n;i++){ amostra(i,0); amostra(i,n-1); amostra(0,i); amostra(n-1,i); }
+  const top=Object.values(conta).sort((a,b)=>b.n-a.n)[0];
+  if(!top) return px;
+  const ref=[top.r/top.n, top.g/top.n, top.b/top.n];
+
+  /* preenchimento a partir das bordas. Marca visto ANTES de testar,
+     senao a pilha volta no mesmo pixel pra sempre. */
+  const visto=new Uint8Array(n*n), pilha=[];
+  for(let i=0;i<n;i++){ pilha.push(i, (n-1)*n+i, i*n, i*n+n-1); }
+  while(pilha.length){
+    const id=pilha.pop();
+    if(visto[id]) continue;
+    visto[id]=1;
+    const p=id*4;
+    const d=Math.abs(px[p]-ref[0])+Math.abs(px[p+1]-ref[1])+Math.abs(px[p+2]-ref[2]);
+    if(d>tol) continue;
+    px[p+3]=0;
+    const x=id%n, y=(id/n)|0;
+    if(x>0)   pilha.push(id-1);
+    if(x<n-1) pilha.push(id+1);
+    if(y>0)   pilha.push(id-n);
+    if(y<n-1) pilha.push(id+n);
+  }
+  return px;
+}
+
+/* ---------- 4. cortar a paleta ---------- */
+function quantizar(px,n,k){
+  const conta={};
+  for(let i=0;i<px.length;i+=4){
+    if(!px[i+3]) continue;
+    const key=((px[i]>>2)<<12)|((px[i+1]>>2)<<6)|(px[i+2]>>2);
+    conta[key]=conta[key]||{n:0,r:0,g:0,b:0};
+    const c=conta[key]; c.n++; c.r+=px[i]; c.g+=px[i+1]; c.b+=px[i+2];
+  }
+  const todas=Object.values(conta).map(c=>({
+    n:c.n, cor:[Math.round(c.r/c.n),Math.round(c.g/c.n),Math.round(c.b/c.n)]
+  }));
+  if(!todas.length) return {px,cores:[]};
+  /* Escolher so as MAIS FREQUENTES mata as cores de destaque: a rachadura
+     de lava tem poucos pixels e perde a votacao pro corpo escuro. Entao:
+     pega a mais comum, e depois sempre a que maximiza frequencia VEZES
+     distancia das ja escolhidas. Assim acento raro entra na paleta. */
+  todas.sort((a,b)=>b.n-a.n);
+  const cores=[todas[0].cor];
+  const usada=new Set([0]);
+  while(cores.length<k && cores.length<todas.length){
+    let melhor=-1, nota=-1;
+    for(let i=0;i<todas.length;i++){
+      if(usada.has(i)) continue;
+      let dmin=Infinity;
+      for(const c of cores){
+        const d=(todas[i].cor[0]-c[0])**2+(todas[i].cor[1]-c[1])**2+(todas[i].cor[2]-c[2])**2;
+        if(d<dmin) dmin=d;
+      }
+      const s=Math.sqrt(todas[i].n)*Math.sqrt(dmin);
+      if(s>nota){ nota=s; melhor=i; }
+    }
+    if(melhor<0) break;
+    usada.add(melhor); cores.push(todas[melhor].cor);
+  }
+  if(!cores.length) return {px,cores};
+  for(let i=0;i<px.length;i+=4){
+    if(!px[i+3]) continue;
+    let melhor=cores[0], dist=Infinity;
+    for(const c of cores){
+      const d=(px[i]-c[0])**2+(px[i+1]-c[1])**2+(px[i+2]-c[2])**2;
+      if(d<dist){ dist=d; melhor=c; }
+    }
+    px[i]=melhor[0]; px[i+1]=melhor[1]; px[i+2]=melhor[2];
+  }
+  return {px,cores};
+}
+
+/* ---------- 5. recortar o vazio em volta ---------- */
+function recortar(px,n){
+  let x0=n,y0=n,x1=-1,y1=-1;
+  for(let y=0;y<n;y++) for(let x=0;x<n;x++)
+    if(px[(y*n+x)*4+3]){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; }
+  if(x1<0) return {px,n,x0:0,y0:0};
+  return {x0,y0,w:x1-x0+1,h:y1-y0+1};
+}
+
+/* ---------- orquestra ---------- */
+function processar(){
+  if(!imgOrig) return;
+  const n=+$('tam').value, k=+$('cor').value, tol=+$('tol').value, mar=+$('mar').value/100;
+  const acento=+($('ace')?$('ace').value:60);
+
+  /* corta a borda (mata marca d'agua de canto) */
+  const cw=imgOrig.width, ch=imgOrig.height;
+  const mx=Math.round(cw*mar), my=Math.round(ch*mar);
+  const src=document.createElement('canvas');
+  src.width=cw-mx*2; src.height=ch-my*2;
+  const sg=src.getContext('2d',{willReadFrequently:true});
+  sg.drawImage(imgOrig,mx,my,src.width,src.height,0,0,src.width,src.height);
+  const dat=sg.getImageData(0,0,src.width,src.height);
+
+  const grade=acharGrade(dat.data,src.width,src.height);
+  let px=reduzir(dat.data,src.width,src.height,n,acento);
+  px=tirarFundo(px,n,tol);
+  const q=quantizar(px,n,k); px=q.px; paleta=q.cores;
+  const rec=recortar(px,n);
+
+  /* monta o canvas final ja recortado */
+  const fin=document.createElement('canvas'); fin.width=rec.w||n; fin.height=rec.h||n;
+  const fg=fin.getContext('2d');
+  const idata=new ImageData(px,n,n);
+  const tmp=document.createElement('canvas'); tmp.width=n; tmp.height=n;
+  tmp.getContext('2d').putImageData(idata,0,0);
+  fg.drawImage(tmp,rec.x0,rec.y0,fin.width,fin.height,0,0,fin.width,fin.height);
+  resultado=fin;
+
+  desenhar(grade,n);
+}
+function desenhar(grade,n){
+  const o=$('cOrig'), og=o.getContext('2d');
+  og.clearRect(0,0,300,300);
+  const e=Math.min(300/imgOrig.width,300/imgOrig.height);
+  og.imageSmoothingEnabled=true;
+  og.drawImage(imgOrig,(300-imgOrig.width*e)/2,(300-imgOrig.height*e)/2,imgOrig.width*e,imgOrig.height*e);
+  $('sOrig').textContent=imgOrig.width+' x '+imgOrig.height+'  ·  bloco ~'+grade.bloco+'px  ·  sugerido: '+grade.logico+' x '+grade.logico;
+
+  const a=$('cAmp'), ag=a.getContext('2d');
+  ag.clearRect(0,0,300,300); ag.imageSmoothingEnabled=false;
+  const ea=Math.floor(Math.min(300/resultado.width,300/resultado.height));
+  const aw=resultado.width*ea, ah=resultado.height*ea;
+  ag.drawImage(resultado,(300-aw)/2,(300-ah)/2,aw,ah);
+  $('sAmp').textContent=resultado.width+' x '+resultado.height+' px  ·  '+paleta.length+' cores';
+
+  const p=$('pal'); p.innerHTML='';
+  for(const c of paleta){ const i=document.createElement('i');
+    i.style.background='rgb('+c[0]+','+c[1]+','+c[2]+')'; p.appendChild(i); }
+
+  const j=$('cJogo'), jg=j.getContext('2d');
+  jg.clearRect(0,0,140,140); jg.imageSmoothingEnabled=false;
+  jg.drawImage(resultado,(140-resultado.width)/2,(140-resultado.height)/2);
+
+  $('baixar').disabled=false; $('copiar').disabled=false;
+  $('info').textContent='pronto';
+}
+for(const id of ['tam','cor','tol','mar','ace']){
+  $(id).addEventListener('input',()=>{
+    $('vTam').textContent=$('tam').value;
+    $('vCor').textContent=$('cor').value;
+    $('vTol').textContent=$('tol').value;
+    $('vMar').textContent=$('mar').value;
+    $('vAce').textContent=$('ace').value;
+    processar();
+  });
+}
+$('baixar').onclick=()=>{
+  const a=document.createElement('a');
+  a.download='sprite-'+resultado.width+'x'+resultado.height+'.png';
+  a.href=resultado.toDataURL('image/png'); a.click();
+};
+$('copiar').onclick=()=>{
+  navigator.clipboard.writeText(resultado.toDataURL('image/png'));
+  $('info').textContent='base64 copiado';
+};
+</script>
+</div></body></html>

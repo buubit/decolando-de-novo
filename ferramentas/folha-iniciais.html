@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Folha de contato — iniciais</title>
+<style>
+body{background:#0c1018;color:#e6edf7;font-family:"Segoe UI",sans-serif;margin:0;padding:22px}
+h1{font-size:20px;margin:0 0 4px}
+h2{font-size:13px;letter-spacing:2px;color:#8b9ab4;margin:24px 0 10px;text-transform:uppercase}
+p.sub{color:#8b9ab4;font-size:13px;margin:0 0 6px;max-width:700px;line-height:1.6}
+.linha{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px}
+.cel{text-align:center}
+.cel canvas{image-rendering:pixelated;background:#1a2436;border-radius:6px;display:block}
+.cel canvas.grama{background:#4e9a5c}
+.cel b{font-size:11px;color:#c8d4e8;font-weight:700;display:block;margin-top:6px}
+.cel i{font-size:10px;color:#5f6d87;font-style:normal;display:block}
+</style></head><body>
+<h1>Folha de contato — os tres iniciais</h1>
+<p class="sub">Tudo <b>animado de verdade</b>: idle de dois quadros com fase propria por unidade, e as auras pulsando.
+Do lado de cada um, o tamanho real no mapa. Nada disso esta no jogo ainda.</p>
+<div id="saida"></div>
+
+<script>
+function montar(p,r,s){
+  const w=Math.max(...r.map(l=>l.length)), h=r.length;
+  const c=document.createElement('canvas'); c.width=w*s; c.height=h*s;
+  const g=c.getContext('2d');
+  for(let y=0;y<h;y++){const li=r[y];
+    for(let x=0;x<li.length;x++){const cor=p[li[x]]; if(!cor)continue;
+      g.fillStyle=cor; g.fillRect(x*s,y*s,s,s);}}
+  return c;
+}
+function respirar(r,pes){
+  const larg=Math.max(...r.map(l=>l.length));
+  const corte=r.length-pes;
+  return ['.'.repeat(larg), ...r.slice(0,corte-1), ...r.slice(corte)];
+}
+/* ============ SISTEMA DE AURAS (padrao do jogo) ============
+   A aura diz o STATUS da unidade a distancia, sem texto e sem sprite novo.
+   Ideia dele: cor por categoria. Lendario+Mega mistura as duas cores.      */
+const AURAS={
+  final:      {n:'Forma final', cores:['#3d7dd8'],           forca:.75},
+  mega:       {n:'Mega',        cores:['#e8453c'],           forca:1},
+  gigantamax: {n:'Gigantamax',  cores:['#ffcb05'],           forca:1.1},
+  lendario:   {n:'Lendario',    cores:['#a86fd6'],           forca:1},
+  lendmega:   {n:'Lendario+',   cores:['#a86fd6','#e8453c'], forca:1.2}
+};
+/* desenha a aura sob a unidade. `t` = tempo em ms, pra pulsar. */
+function desenharAura(g,cx,cy,raio,tipo,t,fase){
+  const A=AURAS[tipo]; if(!A) return;
+  const pulso=.5+.5*Math.sin(t/380+(fase||0));
+  const r=raio*(1+pulso*.06);
+  if(A.cores.length===1){
+    const c=A.cores[0];
+    const grad=g.createRadialGradient(cx,cy,r*.2,cx,cy,r);
+    grad.addColorStop(0,  hexA(c,(.34+pulso*.26)*A.forca));
+    grad.addColorStop(.58,hexA(c,(.14+pulso*.14)*A.forca));
+    grad.addColorStop(1,  hexA(c,0));
+    g.fillStyle=grad;
+    g.beginPath(); g.arc(cx,cy,r,0,6.283); g.fill();
+  } else {
+    /* duas cores: uma gira por dentro da outra */
+    const [c1,c2]=A.cores;
+    const g1=g.createRadialGradient(cx,cy,r*.2,cx,cy,r);
+    g1.addColorStop(0,  hexA(c1,(.32+pulso*.24)*A.forca));
+    g1.addColorStop(.6, hexA(c1,(.12+pulso*.12)*A.forca));
+    g1.addColorStop(1,  hexA(c1,0));
+    g.fillStyle=g1; g.beginPath(); g.arc(cx,cy,r,0,6.283); g.fill();
+    const ang=t/620+(fase||0), dx=Math.cos(ang)*r*.22, dy=Math.sin(ang)*r*.22;
+    const g2=g.createRadialGradient(cx+dx,cy+dy,r*.12,cx+dx,cy+dy,r*.72);
+    g2.addColorStop(0, hexA(c2,(.30+(1-pulso)*.26)*A.forca));
+    g2.addColorStop(1, hexA(c2,0));
+    g.fillStyle=g2; g.beginPath(); g.arc(cx+dx,cy+dy,r*.72,0,6.283); g.fill();
+  }
+}
+function hexA(h,a){
+  const n=parseInt(h.slice(1),16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+Math.max(0,Math.min(1,a)).toFixed(3)+')';
+}
+
+
+const P_CHARM={'1':'#8a3a10','2':'#d4622a','3':'#f4813c','4':'#ffa25e','5':'#c99a5a','6':'#f2d9a8','7':'#fff0cc',
+  '8':'#e04a10','9':'#ff9c1a','0':'#ffe066','a':'#2a4a8a','b':'#dff0ff'};
+const P_CHARZ={'1':'#7a2a10','2':'#c44a22','3':'#e86a30','4':'#ff8f4e','5':'#b8894a','6':'#eed09a','7':'#fff0cc',
+  '8':'#e04a10','9':'#ff9c1a','0':'#ffe066','a':'#2a4a8a','b':'#dff0ff','c':'#2a6a7a','d':'#3d8fa0'};
+const P_RIOLU={'1':'#1a2038','2':'#2e4470','3':'#4a7ac0','4':'#6e9ede','5':'#12141f','6':'#252a3d','7':'#3a4054',
+  '8':'#d8b040','9':'#ffd970','a':'#c02a2a','b':'#ff6a6a','c':'#e8e8f0'};
+const P_FROAK={'1':'#16304a','2':'#2f5a80','3':'#3d7aa8','4':'#5fa0c8','5':'#e8f4fa','6':'#ffffff','7':'#a8d8ea',
+  '8':'#ffd93d','9':'#c8a020','a':'#14141c','b':'#e87a9a','c':'#ff9ab8','d':'#d03a3a'};
+/* Charmander: mexido SO no rosto — olhos de 3 linhas com brilho no topo,
+   narinas, e boca pequena mais embaixo. O resto e o v4 aprovado. */
+const charmander=['........................',
+'.......111111...........',
+'.....1133333311.........',
+'....1333444443331.......',
+'...134444444444431......',
+'...134ab44444ab431......',
+'...134aa44444aa431...8..',
+'...134aa44444aa431..898.',
+'....13444444444431.89098',
+'....13444144144431.89998',
+'.....133341144331...898.',
+'......1333333331.....8..',
+'......13366663311.......',
+'.....13366666633311.....',
+'.....133666666633331....',
+'.....1336666666333331...',
+'.....133666666633331....',
+'.....13366666663331.....',
+'.....1336666666331......',
+'.....133666666331.......',
+'.....13322222331........',
+'.....1331...1331........',
+'....13331..13331........',
+'....1111....1111........'];
+
+const charmeleon=['........................',
+'..............111.......',
+'.......11111113321......',
+'.....113333333321.......',
+'....13334444433 1.......',
+'...1334444444443 1......',
+'...134ab44444ab4431..8..',
+'...134aa44444aa4431.898.',
+'...134aa44444aa4431.898.',
+'...1344444444444431 9098',
+'....134441441444431.9998',
+'....13333411443333 1898.',
+'.....13333333331....8...',
+'.....1336666333 1.......',
+'....13366666663311......',
+'....133666666663331.....',
+'....1336666666663331....',
+'....13366666666633331...',
+'....1336666666663331....',
+'....133666666663331.....',
+'....13322222223331......',
+'....1331......1331......',
+'...13331.....13331......',
+'...1111.......1111......'];
+
+const charizard=['........................',
+'........1.......1.......',
+'..cc.....11...11...cc...',
+'.cddc.....1333 1..cddc..',
+'.cdddc...13344331.cdddc.',
+'.cddddc..13ab4a31.cddc..',
+'.cdddddc.134aa431cdddc..',
+'.cddddddc1344443 1cddc..',
+'.cdddddddc1341431cdc....',
+'.cddddddddc133331cdc....',
+'.1cddddddddc1331cdc.....',
+'..1cdddddddd131 1c......',
+'...1cdddddddd1331.......',
+'....1cdddddd13663 1.....',
+'.....1cdddd1366663 1....',
+'......1cdd13666666 1....',
+'.......1c136666666 1....',
+'.......1336666666631....',
+'.......13366666666331.8.',
+'.......1336666663333 189',
+'.......13322222333333 98',
+'.......1331..1333333318.',
+'......13331..13331......',
+'......1111....111.......'];
+
+/* ============ LINHA DO FROAKIE — v5 ============
+   O que era Frogadier virou Froakie (ele achou a cara certa).           */
+const froakie=['........................',
+'.........1111...........',
+'.......11333311.........',
+'......13333333 1........',
+'......139933999 1.......',
+'......13a933a9331.......',
+'......139aa9a9331.......',
+'......13399999331.......',
+'.......133333331........',
+'.......13311133 1.......',
+'........1333331.........',
+'.....551133331155.......',
+'....56651333315665......',
+'....5665133333 15665....',
+'.....5613333333 1665....',
+'.....561333333331565....',
+'......1333333333155.....',
+'......133333333331......',
+'......13322222 3331.....',
+'......1332222223331.....',
+'......133222222 331.....',
+'......1331.....1331.....',
+'.....16661.....16661....',
+'.....11111.....11111....'];
+
+/* Frogadier: mais alto que o Froakie, bracos abertos com membrana,
+   espuma so na gola. Silhueta de corredor. */
+const frogadier=['........................',
+'.........1111...........',
+'........133333 1........',
+'.......13333333 1.......',
+'.......13993399 1.......',
+'.......1a933a9331.......',
+'.......19aa9a93 1.......',
+'.......1339999331.......',
+'........13333331........',
+'........13311331........',
+'.........133331.........',
+'.......5513333155.......',
+'......5661333316 5......',
+'.....17761333316771.....',
+'....1771.133331.1771....',
+'....177..133331..1771...',
+'....17...133331...171...',
+'.........1333331........',
+'........13333331........',
+'........13322331........',
+'........1332233 1.......',
+'........1331.1331.......',
+'.......16661.16661......',
+'.......11111.11111......'];
+
+/* Greninja: shuriken de agua ATRAS (pontas saindo pelos lados do torso),
+   cachecol rosa subindo, marca vermelha no rosto, joelhos brancos. */
+const greninja=['........................',
+'.........bb.............',
+'........bccb............',
+'........bccb............',
+'........bccb............',
+'.......bbccb............',
+'......11cccc1...........',
+'.....113333331..........',
+'.....1333333331.........',
+'.....1ddddddddd1........',
+'.....1d3dddddd31........',
+'.....18a3dddd3a81.......',
+'.....1aa333333aa1.......',
+'......13333331..........',
+'.5.....1333331.....5....',
+'.55....1333331....55....',
+'.555..113333311..555....',
+'..55551333333315555.....',
+'...5551333333331555.....',
+'....5.11333333311.5.....',
+'......1332222331........',
+'......1366666631........',
+'......1366666631........',
+'......16611..11661......'];
+
+
+const riolu=['........................',
+'........................',
+'.....11..........11.....',
+'....1221........1221....',
+'....12321......12321....',
+'.....12321....12321.....',
+'......12321..12321......',
+'......11231111321.......',
+'......1133333331........',
+'.....13334444433 1......',
+'.....13a3444443a31......',
+'.....13344444443 1......',
+'.....111555555511.......',
+'......155a5555a51.......',
+'......15555555551.......',
+'.......133333331........',
+'......133ccccc331.......',
+'.....133322cc223331.....',
+'.....13332222223331.....',
+'.....13332222223331.....',
+'.....13331111113331.....',
+'.....1331......1331.....',
+'....16661......16661....',
+'....11111......11111....'];
+const lucario=['........................',
+'.......1........1.......',
+'.......16......61.......',
+'.......16......61.......',
+'......1162....2611......',
+'......116211112611......',
+'.....111333333311.......',
+'....13333444444331......',
+'....13a33444444a331.....',
+'....1334444444443 1.....',
+'....11555555555511......',
+'.66.15a5555555a551.66...',
+'.661.1555555555551.166..',
+'.661..1133333311..166...',
+'.66....13333c331...166..',
+'..6...1333ccc3331...16..',
+'......13332cc23331......',
+'.....1333322223333 1....',
+'....13333222222233331...',
+'....1333311111113333 1..',
+'....13331........13331..',
+'....1331..........1331..',
+'...166661........166661.',
+'...111111........111111.'];
+const megalucario=lucario;
+
+/* nome, rows, paleta, linhas-de-pe, aura */
+const FICHA=[
+ ['Charmander -> Charmeleon -> Charizard',[
+   ['Charmander',charmander,P_CHARM,3,null],
+   ['Charmeleon',charmeleon,P_CHARZ,3,null],
+   ['Charizard', charizard, P_CHARZ,2,'final']]],
+ ['Riolu -> Lucario -> Mega Lucario',[
+   ['Riolu',riolu,P_RIOLU,2,null],
+   ['Lucario',lucario,P_RIOLU,2,'final'],
+   ['Mega Lucario',megalucario,P_RIOLU,2,'mega']]],
+ ['Froakie -> Frogadier -> Greninja',[
+   ['Froakie',froakie,P_FROAK,2,null],
+   ['Frogadier',frogadier,P_FROAK,2,null],
+   ['Greninja',greninja,P_FROAK,1,'final']]]
+];
+const DEMO_AURA=[['final','Forma final'],['mega','Mega'],['gigantamax','Gigantamax'],
+                 ['lendario','Lendario'],['lendmega','Lendario + Mega']];
+
+const animados=[];
+function celula(rows,pal,pes,aura,esc,naGrama){
+  const a=montar(pal,rows,esc), b=montar(pal,respirar(rows,pes),esc);
+  const cv=document.createElement('canvas');
+  cv.width=a.width+esc*10; cv.height=a.height+esc*10;
+  if(naGrama) cv.className='grama';
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=false;
+  animados.push({g,a,b,cv,aura,fase:Math.random()*6.283});
+  return cv;
+}
+const out=document.getElementById('saida');
+for(const [titulo,itens] of FICHA){
+  const h=document.createElement('h2'); h.textContent=titulo; out.appendChild(h);
+  const div=document.createElement('div'); div.className='linha';
+  for(const [nome,rows,pal,pes,aura] of itens){
+    for(const [esc,naGrama,rot] of [[7,false,''],[2,true,'tamanho real']]){
+      const c=document.createElement('div'); c.className='cel';
+      c.appendChild(celula(rows,pal,pes,aura,esc,naGrama));
+      const b=document.createElement('b'); b.textContent=nome; c.appendChild(b);
+      if(rot){const i=document.createElement('i');i.textContent=rot;c.appendChild(i);}
+      div.appendChild(c);
+    }
+  }
+  out.appendChild(div);
+}
+/* tabela de auras, usando o Lucario como cobaia */
+const h=document.createElement('h2'); h.textContent='As cinco auras'; out.appendChild(h);
+const pa=document.createElement('p'); pa.className='sub';
+pa.innerHTML='Mesmo sprite nos cinco. A aura sozinha diz o que a unidade e — sem texto, sem sprite novo.';
+out.appendChild(pa);
+const dv=document.createElement('div'); dv.className='linha';
+for(const [tipo,rot] of DEMO_AURA){
+  const c=document.createElement('div'); c.className='cel';
+  c.appendChild(celula(lucario,P_RIOLU,2,tipo,4,false));
+  const b=document.createElement('b'); b.textContent=rot; c.appendChild(b);
+  dv.appendChild(c);
+}
+out.appendChild(dv);
+
+function quadro(){
+  const t=performance.now();
+  for(const o of animados){
+    const g=o.g, cv=o.cv;
+    g.clearRect(0,0,cv.width,cv.height);
+    if(o.aura) desenharAura(g,cv.width/2,cv.height/2,Math.min(cv.width,cv.height)*.52,o.aura,t,o.fase);
+    const f=(Math.floor(t/420+o.fase)%2)===0 ? o.a : o.b;
+    g.drawImage(f,(cv.width-o.a.width)/2,(cv.height-o.a.height)/2);
+  }
+  requestAnimationFrame(quadro);
+}
+requestAnimationFrame(quadro);
+</script>
+</body></html>

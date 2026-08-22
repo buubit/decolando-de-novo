@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Charmander — variacoes</title>
+<style>
+body{background:#0c1018;color:#e6edf7;font-family:"Segoe UI",sans-serif;margin:0;padding:22px}
+h1{font-size:20px;margin:0 0 4px}
+p.sub{color:#8b9ab4;font-size:13px;margin:0 0 18px;max-width:700px;line-height:1.6}
+.linha{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end}
+.cel{text-align:center}
+.cel canvas{image-rendering:pixelated;background:#1a2436;border-radius:6px;display:block}
+.cel canvas.grama{background:#4e9a5c}
+.cel b{font-size:12px;color:#c8d4e8;font-weight:700;display:block;margin-top:6px}
+.cel i{font-size:10.5px;color:#8b9ab4;font-style:normal;display:block;max-width:150px;line-height:1.4}
+</style></head><body>
+<h1>Charmander — qual tratamento?</h1>
+<p class="sub">Mesma forma nas tres primeiras, mudando so contorno e cores. A quarta muda a forma:
+cauda grossa subindo atras em vez de chama flutuando do lado. Me diz qual chega mais perto.</p>
+<div id="saida"></div>
+<script>
+function montar(p,r,s){const w=Math.max(...r.map(l=>l.length)),h=r.length;
+  const c=document.createElement('canvas');c.width=w*s;c.height=h*s;const g=c.getContext('2d');
+  for(let y=0;y<h;y++){const li=r[y];for(let x=0;x<li.length;x++){const cor=p[li[x]];if(!cor)continue;
+    g.fillStyle=cor;g.fillRect(x*s,y*s,s,s);}}return c;}
+function respirar(r,pes){const larg=Math.max(...r.map(l=>l.length));const corte=r.length-pes;
+  return ['.'.repeat(larg),...r.slice(0,corte-1),...r.slice(corte)];}
+/* mesma forma do v5 aprovado-quase, mudando so o TRATAMENTO */
+const CH_ROWS=['........................',
+'.......111111...........',
+'.....1133333311.........',
+'....1333444443331.......',
+'...134444444444431......',
+'...134ab44444ab431......',
+'...134aa44444aa431...8..',
+'...134aa44444aa431..898.',
+'....13444444444431.89098',
+'....13444144144431.89998',
+'.....133341144331...898.',
+'......1333333331.....8..',
+'......13366663311.......',
+'.....13366666633311.....',
+'.....133666666633331....',
+'.....1336666666333331...',
+'.....133666666633331....',
+'.....13366666663331.....',
+'.....1336666666331......',
+'.....133666666331.......',
+'.....13322222331........',
+'.....1331...1331........',
+'....13331..13331........',
+'....1111....1111........'];
+
+/* A: o de agora — contorno marrom, laranja pastel */
+const PAL_A={'1':'#8a3a10','2':'#d4622a','3':'#f4813c','4':'#ffa25e','5':'#c99a5a','6':'#f2d9a8','7':'#fff0cc',
+  '8':'#e04a10','9':'#ff9c1a','0':'#ffe066','a':'#2a4a8a','b':'#dff0ff'};
+/* B: contorno PRETO e laranja saturado, tipo a sua referencia */
+const PAL_B={'1':'#141414','2':'#c4471a','3':'#f26a28','4':'#ff9048','5':'#d8a860','6':'#ffdd9e','7':'#fff0cc',
+  '8':'#e03a10','9':'#ff9c1a','0':'#ffe066','a':'#141414','b':'#ffffff'};
+/* C: contorno preto + barriga bem amarela + olho branco com pupila */
+const PAL_C={'1':'#101010','2':'#c43a14','3':'#f05a1e','4':'#ff8038','5':'#e8c040','6':'#ffe870','7':'#fff8c0',
+  '8':'#e02800','9':'#ffb000','0':'#ffe840','a':'#101010','b':'#ffffff'};
+
+/* D: forma nova — cauda GROSSA subindo atras, chama grande, contorno preto */
+const CH_ROWS_D=['........................',
+'.......111111.....11....',
+'.....1133333311..1991...',
+'....1333444443331199 1..',
+'...1344444444444319891..',
+'...134ba44444ab431 891..',
+'...134aa44444aa4311891..',
+'...134aa44444aa43118 1..',
+'....134444444444311331..',
+'....13444144144431133 1.',
+'.....13334114433113331..',
+'......13333333311333 1..',
+'......133666633113331...',
+'.....1336666663313331...',
+'.....13366666663333 1...',
+'.....133666666633331....',
+'.....13366666663331.....',
+'.....1336666666331......',
+'.....13366666633 1......',
+'.....133666666331.......',
+'.....13322222331........',
+'.....1331...1331........',
+'....13331..13331........',
+'....1111....1111........'];
+
+const OPCOES=[
+ ['A — como esta hoje', CH_ROWS, PAL_A, 'contorno marrom, laranja pastel'],
+ ['B — contorno preto', CH_ROWS, PAL_B, 'mesma forma, contorno preto e laranja saturado'],
+ ['C — preto + barriga amarela', CH_ROWS, PAL_C, 'contorno preto, barriga bem amarela, olho branco'],
+ ['D — cauda grossa atras', CH_ROWS_D, PAL_C, 'forma nova: cauda subindo atras em vez de chama solta']
+];
+const animados=[];
+function celula(rows,pal,esc,naGrama){
+  const a=montar(pal,rows,esc),b=montar(pal,respirar(rows,3),esc);
+  const cv=document.createElement('canvas');cv.width=a.width+esc*6;cv.height=a.height+esc*6;
+  if(naGrama)cv.className='grama';
+  const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+  animados.push({g,a,b,cv,fase:Math.random()*2});return cv;}
+const out=document.getElementById('saida');
+const div=document.createElement('div');div.className='linha';
+for(const [rot,rows,pal,desc] of OPCOES){
+  const c=document.createElement('div');c.className='cel';
+  c.appendChild(celula(rows,pal,7,false));
+  const b=document.createElement('b');b.textContent=rot;c.appendChild(b);
+  const i=document.createElement('i');i.textContent=desc;c.appendChild(i);
+  div.appendChild(c);
+}
+out.appendChild(div);
+const div2=document.createElement('div');div2.className='linha';
+div2.style.marginTop='16px';
+for(const [rot,rows,pal] of OPCOES){
+  const c=document.createElement('div');c.className='cel';
+  c.appendChild(celula(rows,pal,3,true));
+  const b=document.createElement('b');b.textContent=rot.split(' ')[0];c.appendChild(b);
+  const i=document.createElement('i');i.textContent='tamanho real';c.appendChild(i);
+  div2.appendChild(c);
+}
+out.appendChild(div2);
+function quadro(){const t=performance.now();
+  for(const o of animados){const g=o.g,cv=o.cv;g.clearRect(0,0,cv.width,cv.height);
+    const f=(Math.floor(t/420+o.fase)%2)===0?o.a:o.b;
+    g.drawImage(f,(cv.width-o.a.width)/2,(cv.height-o.a.height)/2);}
+  requestAnimationFrame(quadro);}
+requestAnimationFrame(quadro);
+</script></body></html>

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>24 x 32 x 64</title>
+<style>
+body{background:#0c1018;color:#e6edf7;font-family:"Segoe UI",sans-serif;margin:0;padding:22px}
+h1{font-size:20px;margin:0 0 4px}
+h2{font-size:13px;letter-spacing:2px;color:#8b9ab4;margin:24px 0 10px;text-transform:uppercase}
+p.sub{color:#8b9ab4;font-size:13px;margin:0 0 10px;max-width:720px;line-height:1.6}
+.linha{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end}
+.cel{text-align:center}
+.cel canvas{image-rendering:pixelated;background:#1a2436;border-radius:6px;display:block}
+.cel canvas.grama{background:#4e9a5c}
+.cel b{font-size:12px;color:#c8d4e8;font-weight:700;display:block;margin-top:6px}
+.cel i{font-size:10.5px;color:#8b9ab4;font-style:normal;display:block}
+</style></head><body>
+<h1>24 x 32 x 64 — desenhado por geometria</h1>
+<p class="sub">Mesma descricao de formas renderizada em tres resolucoes. Em cima, ampliado pra caber na tela;
+embaixo, o tamanho real que ocuparia no mapa. Repare que a cauda e o cachecol <b>conectam</b> — eles nascem
+de um ponto do corpo, nao sao desenhados ao lado.</p>
+<div id="saida"></div>
+<script>
+/* ============================================================
+   DESENHO POR GEOMETRIA
+   Em vez de escrever 4096 caracteres as cegas, descrevo o Pokemon como
+   formas em coordenadas 0..1 e deixo o codigo pixelizar em qualquer
+   resolucao. Apendice nasce de um ponto do corpo, entao SEMPRE conecta.
+   ============================================================ */
+
+/* --- primitivas: tudo em espaco 0..1 --- */
+const elipse=(x,y,rx,ry,cor,rot)=>({t:'e',x,y,rx,ry,cor,rot:rot||0});
+const curva =(pts,g0,g1,cor)=>({t:'c',pts,g0,g1,cor});   /* espinha + grossura */
+const gota  =(x,y,r,cor)=>({t:'g',x,y,r,cor});
+
+function tracarForma(g,f,S){
+  if(f.t==='e'){
+    g.save(); g.translate(f.x*S,f.y*S); g.rotate(f.rot);
+    g.beginPath(); g.ellipse(0,0,f.rx*S,f.ry*S,0,0,6.2832); g.restore();
+  } else if(f.t==='c'){
+    /* curva grossa: percorre a espinha e engrossa/afina ao longo dela */
+    const N=28, pts=f.pts, esq=[], dir=[];
+    for(let i=0;i<=N;i++){
+      const t=i/N, p=pontoBezier(pts,t), d=tangenteBezier(pts,t);
+      const L=Math.hypot(d.x,d.y)||1, nx=-d.y/L, ny=d.x/L;
+      const gr=(f.g0+(f.g1-f.g0)*t)*S/2;
+      esq.push([p.x*S+nx*gr, p.y*S+ny*gr]);
+      dir.push([p.x*S-nx*gr, p.y*S-ny*gr]);
+    }
+    g.beginPath(); g.moveTo(esq[0][0],esq[0][1]);
+    for(const [x,y] of esq) g.lineTo(x,y);
+    for(let i=dir.length-1;i>=0;i--) g.lineTo(dir[i][0],dir[i][1]);
+    g.closePath();
+  } else if(f.t==='g'){
+    /* gota de chama: base arredondada, ponta pra cima */
+    const x=f.x*S, y=f.y*S, r=f.r*S;
+    g.beginPath();
+    g.moveTo(x, y-r*1.9);
+    g.bezierCurveTo(x+r*.95, y-r*.5, x+r, y+r*.55, x, y+r);
+    g.bezierCurveTo(x-r, y+r*.55, x-r*.95, y-r*.5, x, y-r*1.9);
+    g.closePath();
+  }
+}
+function pontoBezier(p,t){
+  if(p.length===2) return {x:p[0][0]+(p[1][0]-p[0][0])*t, y:p[0][1]+(p[1][1]-p[0][1])*t};
+  const u=1-t;
+  if(p.length===3) return {x:u*u*p[0][0]+2*u*t*p[1][0]+t*t*p[2][0],
+                           y:u*u*p[0][1]+2*u*t*p[1][1]+t*t*p[2][1]};
+  return {x:u*u*u*p[0][0]+3*u*u*t*p[1][0]+3*u*t*t*p[2][0]+t*t*t*p[3][0],
+          y:u*u*u*p[0][1]+3*u*u*t*p[1][1]+3*u*t*t*p[2][1]+t*t*t*p[3][1]};
+}
+function tangenteBezier(p,t){
+  const e=.001, a=pontoBezier(p,Math.max(0,t-e)), b=pontoBezier(p,Math.min(1,t+e));
+  return {x:b.x-a.x, y:b.y-a.y};
+}
+
+/* --- monta o bicho: 2 passadas (silhueta preta, depois cor) --- */
+function desenharCriatura(def,S,contorno){
+  const c=document.createElement('canvas'); c.width=S; c.height=S;
+  const g=c.getContext('2d');
+  const lw=Math.max(1.4, S*contorno);
+  /* passada 1: silhueta preta engrossada */
+  g.fillStyle=def.contorno||'#141414'; g.strokeStyle=def.contorno||'#141414';
+  g.lineWidth=lw; g.lineJoin='round'; g.lineCap='round';
+  for(const f of def.formas){ if(f.semContorno) continue; tracarForma(g,f,S); g.fill(); g.stroke(); }
+  /* passada 2: cores por cima, sem stroke */
+  for(const f of def.formas){ tracarForma(g,f,S); g.fillStyle=f.cor; g.fill(); }
+  /* passada 3: detalhes (olho, brilho) desenhados por ultimo */
+  for(const f of (def.detalhes||[])){ tracarForma(g,f,S); g.fillStyle=f.cor; g.fill(); }
+  return c;
+}
+
+/* --- quantiza pra paleta: e o que devolve cara de pixel art --- */
+function quantizar(cv,paleta,corte){
+  const g=cv.getContext('2d'), d=g.getImageData(0,0,cv.width,cv.height), p=d.data;
+  const cores=paleta.map(h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),h]);
+  for(let i=0;i<p.length;i+=4){
+    if(p[i+3]<(corte||128)){ p[i+3]=0; continue; }
+    p[i+3]=255;
+    let melhor=null, dist=1e9;
+    for(const [r,gg,b] of cores){
+      const dd=(p[i]-r)**2+(p[i+1]-gg)**2+(p[i+2]-b)**2;
+      if(dd<dist){ dist=dd; melhor=[r,gg,b]; }
+    }
+    p[i]=melhor[0]; p[i+1]=melhor[1]; p[i+2]=melhor[2];
+  }
+  g.putImageData(d,0,0);
+  return cv;
+}
+function gerar(def,S,paleta){
+  return quantizar(desenharCriatura(def,S,def.contornoEsp||.035),paleta,def.corte);
+}
+
+/* Charmander descrito como geometria, de perfil olhando pra direita.
+   A cauda nasce em (0.36,0.70) — um ponto DENTRO do corpo — entao ela
+   conecta por construcao. Era exatamente o que eu errava desenhando a mao. */
+const PAL_CHAR=['#141414','#b8390f','#e85a1e','#f5793b','#ff9e5e','#ffc48a',
+                '#c9922e','#f0c060','#ffe8a8','#ffffff','#e02800','#ff8c1a','#ffd93d'];
+
+const CHARMANDER_GEO={
+  contorno:'#141414', contornoEsp:.030, corte:150,
+  formas:[
+    /* cauda: espinha em bezier saindo do corpo, engrossando na base */
+    curva([[0.40,0.74],[0.22,0.86],[0.07,0.74],[0.09,0.52]], 0.19, 0.075, '#e85a1e'),
+    /* corpo */
+    elipse(0.44,0.70,0.20,0.19,'#f5793b'),
+    /* coxa de tras */
+    elipse(0.36,0.83,0.10,0.08,'#e85a1e'),
+    /* perna da frente */
+    elipse(0.55,0.87,0.105,0.085,'#f5793b'),
+    elipse(0.63,0.915,0.075,0.045,'#ff9e5e'),
+    /* braco */
+    elipse(0.58,0.66,0.075,0.055,'#f5793b',-0.5),
+    /* cabeca */
+    elipse(0.55,0.34,0.235,0.195,'#f5793b'),
+    /* focinho projetando pra frente */
+    elipse(0.71,0.40,0.115,0.085,'#ff9e5e'),
+    /* chama da cauda */
+    gota(0.09,0.435,0.082,'#ff8c1a')
+  ],
+  detalhes:[
+    /* barriga */
+    elipse(0.475,0.755,0.135,0.135,'#ffe8a8'),
+    /* nucleo claro da chama */
+    gota(0.09,0.452,0.046,'#ffd93d'),
+    /* olho: branco + pupila */
+    elipse(0.615,0.315,0.052,0.062,'#ffffff'),
+    elipse(0.628,0.325,0.026,0.036,'#141414'),
+    /* narina e boca */
+    elipse(0.755,0.375,0.014,0.012,'#141414'),
+    elipse(0.685,0.455,0.055,0.014,'#141414')
+  ]
+};
+
+/* Greninja: corpo esguio, cachecol saindo do pescoco como curva
+   (conecta por construcao), shuriken como disco atras do ombro. */
+const PAL_GREN=['#141414','#0e2038','#1e3a5f','#2f5f8f','#4a86b8','#7fb4d8',
+                '#d8ecf8','#ffffff','#c8a020','#ffd93d','#b03858','#e0486f','#ff85a8'];
+
+const GRENINJA_GEO={
+  contorno:'#141414', contornoEsp:.028, corte:150,
+  formas:[
+    /* shuriken atras: disco grande */
+    elipse(0.25,0.50,0.175,0.055,'#d8ecf8',0.79),
+    elipse(0.25,0.50,0.175,0.055,'#d8ecf8',-0.79),
+    /* cachecol: curva longa saindo do pescoco */
+    curva([[0.52,0.44],[0.36,0.30],[0.30,0.10],[0.46,0.05]], 0.085, 0.045, '#e0486f'),
+    /* pernas */
+    elipse(0.44,0.86,0.095,0.10,'#1e3a5f'),
+    elipse(0.60,0.86,0.095,0.10,'#1e3a5f'),
+    /* corpo */
+    elipse(0.52,0.66,0.165,0.20,'#2f5f8f'),
+    /* braco */
+    elipse(0.66,0.62,0.08,0.055,'#2f5f8f',-0.35),
+    /* cabeca */
+    elipse(0.54,0.30,0.185,0.165,'#2f5f8f'),
+    /* focinho */
+    elipse(0.68,0.34,0.085,0.062,'#4a86b8')
+  ],
+  detalhes:[
+    /* miolo da shuriken */
+    elipse(0.25,0.50,0.042,0.042,'#ffffff'),
+    /* peito claro */
+    elipse(0.53,0.72,0.085,0.11,'#7fb4d8'),
+    /* olho amarelo com pupila */
+    elipse(0.60,0.27,0.058,0.048,'#ffd93d'),
+    elipse(0.615,0.275,0.026,0.030,'#141414'),
+    /* boca */
+    elipse(0.665,0.395,0.062,0.013,'#141414')
+  ]
+};
+
+const CASOS=[
+ ['Charmander', CHARMANDER_GEO, PAL_CHAR],
+ ['Greninja',   GRENINJA_GEO,   PAL_GREN]
+];
+const out=document.getElementById('saida');
+for(const [nome,def,pal] of CASOS){
+  const h=document.createElement('h2'); h.textContent=nome; out.appendChild(h);
+  const d1=document.createElement('div'); d1.className='linha';
+  for(const S of [24,32,64]){
+    const src=gerar(def,S,pal);
+    const esc = S===24?7 : S===32?5.25 : 2.625;   /* todos ficam ~168px */
+    const cv=document.createElement('canvas');
+    cv.width=Math.round(S*esc); cv.height=Math.round(S*esc);
+    const g=cv.getContext('2d'); g.imageSmoothingEnabled=false;
+    g.drawImage(src,0,0,cv.width,cv.height);
+    const c=document.createElement('div'); c.className='cel';
+    c.appendChild(cv);
+    const b=document.createElement('b'); b.textContent=S+' x '+S; c.appendChild(b);
+    const i=document.createElement('i'); i.textContent=(S*S)+' pixels'; c.appendChild(i);
+    d1.appendChild(c);
+  }
+  out.appendChild(d1);
+  const d2=document.createElement('div'); d2.className='linha'; d2.style.marginTop='14px';
+  for(const [S,esc,rot] of [[24,2,'48px (padrao de hoje)'],[32,2,'64px'],[64,1,'64px'],[64,2,'128px — grande demais']]){
+    const src=gerar(def,S,pal);
+    const cv=document.createElement('canvas');
+    cv.width=S*esc+18; cv.height=S*esc+18; cv.className='grama';
+    const g=cv.getContext('2d'); g.imageSmoothingEnabled=false;
+    g.drawImage(src,9,9,S*esc,S*esc);
+    const c=document.createElement('div'); c.className='cel';
+    c.appendChild(cv);
+    const b=document.createElement('b'); b.textContent=S+' @ '+esc+'x'; c.appendChild(b);
+    const i=document.createElement('i'); i.textContent=rot; c.appendChild(i);
+    d2.appendChild(c);
+  }
+  out.appendChild(d2);
+}
+</script></body></html>

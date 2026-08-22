@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Prompts pro Leonardo AI</title>
+<style>
+:root{--bg:#0c1018;--painel:#151c29;--painel2:#1e2739;--borda:#2c3850;--txt:#e6edf7;
+  --fraco:#8b9ab4;--ouro:#ffcb05;--verde:#4cc76a;--roxo:#a86fd6;--vermelho:#e8453c}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",system-ui,sans-serif;
+  margin:0;padding:26px;line-height:1.55}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:24px;margin:0 0 6px}
+h2{font-size:12px;letter-spacing:2.4px;color:var(--fraco);text-transform:uppercase;
+  margin:34px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--borda)}
+h3{font-size:15px;margin:22px 0 8px;color:var(--ouro)}
+p{color:var(--fraco);font-size:13.5px;max-width:760px}
+p.lead{font-size:14px;color:#c3cee0;margin-bottom:20px}
+b{color:var(--txt)}
+.bloco{background:var(--painel);border:1px solid var(--borda);border-radius:10px;
+  padding:0;margin:10px 0 18px;overflow:hidden}
+.bloco .topo{display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:var(--painel2);border-bottom:1px solid var(--borda)}
+.bloco .topo span{font-size:11px;letter-spacing:1.6px;color:var(--fraco);
+  text-transform:uppercase;font-weight:700}
+.bloco .topo button{margin-left:auto;background:var(--painel);border:1px solid var(--borda);
+  color:var(--txt);border-radius:7px;padding:5px 13px;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:.12s}
+.bloco .topo button:hover{background:#2a3550;border-color:#41527a}
+.bloco .topo button.ok{background:var(--verde);border-color:#6fe08d;color:#06210d}
+pre{margin:0;padding:13px 15px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;
+  color:#d8e4f5;white-space:pre-wrap;word-break:break-word}
+.neg pre{color:#f0b8b8}
+.conf{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:14px 0}
+.conf div{background:var(--painel);border:1px solid var(--borda);border-radius:9px;padding:10px 13px}
+.conf b{display:block;font-size:11px;letter-spacing:1.4px;color:var(--fraco);
+  text-transform:uppercase;margin-bottom:3px;font-weight:700}
+.conf i{font-style:normal;font-size:14px;color:var(--txt);font-weight:600}
+.aviso{background:#2a1212;border:1px solid #5a2a2a;border-radius:10px;padding:13px 16px;
+  color:#ffb0b0;font-size:13px;margin:16px 0}
+.dica{background:#12251a;border:1px solid #2a5a38;border-radius:10px;padding:13px 16px;
+  color:#a8e8c0;font-size:13px;margin:16px 0}
+code{background:#0e1520;border:1px solid var(--borda);border-radius:4px;padding:1px 6px;
+  font-family:ui-monospace,monospace;font-size:12px;color:var(--ouro)}
+.lacuna{color:var(--roxo);font-weight:700}
+</style></head>
+<body><div class="wrap">
+
+<h1>Prompts pro Leonardo AI</h1>
+<p class="lead">Cada bloco tem botão de copiar. A regra de ouro pra manter consistência entre
+todos os dragões: <b>o bloco de ESTILO nunca muda</b> — só a parte da criatura.</p>
+
+<h2>Configuração no Leonardo</h2>
+<div class="conf">
+  <div><b>Modelo</b><i>Leonardo Phoenix</i></div>
+  <div><b>Preset / Style</b><i>Pixel Art</i></div>
+  <div><b>Dimensões</b><i>1024 × 1024</i></div>
+  <div><b>Guidance Scale</b><i>7</i></div>
+  <div><b>Nº de imagens</b><i>4 por vez</i></div>
+  <div><b>Alchemy / PhotoReal</b><i>Desligado</i></div>
+</div>
+<p>Se aparecer a opção de <b>Elements</b> e existir um chamado <b>Pixel Art</b>, liga com peso
+entre 0,6 e 0,9. É o que mais aproxima do resultado que a gente quer. Gerar em 1024 e reduzir
+depois dá muito mais qualidade do que pedir imagem pequena.</p>
+
+<h2>1. O negative prompt — cola em TODOS</h2>
+<p>No Leonardo isso pesa tanto quanto o prompt principal. É o que impede a imagem de virar
+um desenho borrado em vez de pixel art.</p>
+<div class="bloco neg">
+  <div class="topo"><span>Negative prompt</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>blurry, anti-aliasing, smooth gradients, soft shading, painterly, 3d render, octane, realistic, photograph, depth of field, motion blur, text, letters, watermark, signature, logo, ui, frame, border, grid lines, multiple characters, duplicate, cropped, out of frame, extra limbs, deformed anatomy, cluttered background, scenery, landscape, low contrast, washed out, noisy, jpeg artifacts</pre>
+</div>
+
+<h2>2. A âncora de estilo — o segredo da consistência</h2>
+<p>Este trecho vai <b>no fim de todo prompt</b>, sempre igual, palavra por palavra. É ele que
+faz o dragão nº 10 parecer do mesmo jogo que o nº 1. Não reescreva, não melhore, não traduza.</p>
+<div class="bloco">
+  <div class="topo"><span>Âncora de estilo</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h2>3. A linha do Dragão Brasa</h2>
+<p>Os três estágios. Repare que a parte de <b>identidade</b> (escamas de carvão, rachaduras de
+lava, chifres curvos, chama na cauda) é <span class="lacuna">repetida literalmente</span> nos três
+— é isso que faz parecerem o mesmo bicho crescendo.</p>
+
+<h3>Estágio 1 — Filhote</h3>
+<div class="bloco">
+  <div class="topo"><span>Prompt</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a baby dragon whelp, charcoal black scales with glowing molten orange lava cracks, two small curved horns, tiny leathery wings too small to fly, stubby tail tipped with a small flame, chunky cute proportions with an oversized head, one big bright yellow eye visible, sitting alert, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h3>Estágio 2 — Adulto</h3>
+<div class="bloco">
+  <div class="topo"><span>Prompt</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>an adult dragon, charcoal black scales with glowing molten orange lava cracks, two long curved horns, large leathery wings fully spread, tail tipped with a burning flame, lean muscular build standing on four legs, bright yellow eyes, confident powerful stance, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h3>Estágio 3 — Ancião</h3>
+<div class="bloco">
+  <div class="topo"><span>Prompt</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>an ancient colossal dragon, charcoal black scales split by wide rivers of glowing molten orange lava, a crown of many long curved horns, enormous battle torn leathery wings spread wide, massive tail engulfed in flame, heavy armored build, burning yellow eyes, imposing and scarred, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h2>4. Molde pra qualquer dragão novo</h2>
+<p>Troca só o que está <span class="lacuna">destacado</span>. Mantém o resto intacto.
+Escolha <b>material + cor + um detalhe marcante</b> e repita esses três nos estágios seguintes.</p>
+<div class="bloco">
+  <div class="topo"><span>Molde — estágio 1</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a baby dragon whelp, [MATERIAL E COR DAS ESCAMAS], [DETALHE MARCANTE], two small horns, tiny wings too small to fly, stubby tail [COMO TERMINA A CAUDA], chunky cute proportions with an oversized head, one big bright eye visible, sitting alert, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h3>Exemplos de preenchimento</h3>
+<div class="bloco">
+  <div class="topo"><span>Dragão de Pirulito</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a baby dragon whelp, glossy candy scales in swirled pink and white stripes like a peppermint, a spiral lollipop growing from its forehead, two small candy cane horns, tiny wings too small to fly, stubby tail ending in a round wrapped bonbon, chunky cute proportions with an oversized head, one big bright eye visible, sitting alert, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+<div class="bloco">
+  <div class="topo"><span>Dragão de Sucata</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a baby dragon whelp, rusted scrap metal plates bolted over its body in mismatched grey and orange rust, a cracked headlight as one eye, two bent rebar horns, tiny wings made of torn corrugated sheet metal, stubby tail ending in a heavy loose bolt, chunky cute proportions with an oversized head, sitting alert, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+<div class="bloco">
+  <div class="topo"><span>Dragão de Cristal</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a baby dragon whelp, translucent pale blue crystal scales with sharp faceted edges, glowing white core visible through its chest, two clear quartz horns, tiny wings like thin sheets of ice, stubby tail ending in a jagged crystal shard, chunky cute proportions with an oversized head, one big glowing eye visible, sitting alert, 16-bit SNES era pixel art sprite, low top-down three-quarter view, single character centered, full body visible, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h2>5. Assets pra casa e pro cenário</h2>
+<p>Mesma âncora de estilo, trocando "character" por "object". Serve pra cama, mesa, tapete,
+baú, árvore, pedra — tudo que você quiser posicionar na casa dos dragões.</p>
+<div class="bloco">
+  <div class="topo"><span>Molde de objeto</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a single [OBJETO], [MATERIAL E COR], cozy fantasy dragon den furniture, 16-bit SNES era pixel art sprite, low top-down three-quarter view, one object centered, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+<div class="bloco">
+  <div class="topo"><span>Exemplo — cama de dragão</span><button onclick="cp(this)">Copiar</button></div>
+  <pre>a single large round nest bed for a dragon, woven dark straw with a thick crimson cushion and scattered gold coins, cozy fantasy dragon den furniture, 16-bit SNES era pixel art sprite, low top-down three-quarter view, one object centered, plain flat solid background, crisp hard pixel edges, strict limited color palette of 12 colors, bold dark outline on every silhouette, simple cel shading with two tones per surface, high readability at small size, game asset sprite sheet style</pre>
+</div>
+
+<h2>6. O que fazer com o resultado</h2>
+<div class="aviso">
+<b>Atenção:</b> o Leonardo não devolve pixel art de verdade. Ele devolve uma imagem grande que
+<i>parece</i> pixel art — com bordas suavizadas, centenas de cores e o "pixel" desalinhado da grade.
+Colocar isso direto no jogo fica borrado e destoa.
+</div>
+<div class="dica">
+<b>Mas isso tem conserto, e é comigo.</b> Me manda as imagens que eu reduzo pra 64×64 com vizinho
+mais próximo, alinho na grade e reduzo a paleta pra 12 cores fixas — que é exatamente o processo
+que já usei na bancada de geometria. O resultado sai como sprite limpo e no mesmo padrão do resto do jogo.
+</div>
+<p>Duas coisas que ajudam muito na hora de escolher entre as 4 imagens que o Leonardo gera:
+prefira a que tem <b>fundo mais liso</b> e a que tem o <b>contorno mais fechado</b> — essas duas
+sobrevivem melhor à redução. Detalhe fino demais some quando encolhe.</p>
+
+</div>
+<script>
+function cp(btn){
+  const txt=btn.closest('.bloco').querySelector('pre').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const antes=btn.textContent;
+    btn.textContent='Copiado'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=antes;btn.classList.remove('ok');},1400);
+  });
+}
+</script>
+</body></html>

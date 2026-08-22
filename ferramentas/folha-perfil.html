@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Frente x Perfil</title>
+<style>
+body{background:#0c1018;color:#e6edf7;font-family:"Segoe UI",sans-serif;margin:0;padding:22px}
+h1{font-size:20px;margin:0 0 4px}
+h2{font-size:13px;letter-spacing:2px;color:#8b9ab4;margin:24px 0 10px;text-transform:uppercase}
+p.sub{color:#8b9ab4;font-size:13px;margin:0 0 8px;max-width:700px;line-height:1.6}
+.linha{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end}
+.cel{text-align:center}
+.cel canvas{image-rendering:pixelated;background:#1a2436;border-radius:6px;display:block}
+.cel canvas.grama{background:#4e9a5c}
+.cel b{font-size:12px;color:#c8d4e8;font-weight:700;display:block;margin-top:6px}
+.cel i{font-size:10px;color:#5f6d87;font-style:normal;display:block}
+.novo b{color:#6fe08d}
+</style></head><body>
+<h1>Frente x Perfil</h1>
+<p class="sub">Todas as suas referencias sao de perfil. Aqui esta a comparacao direta: o que eu tinha feito
+(de frente) e a mesma criatura de lado. Animados, com idle de dois quadros.</p>
+<div id="saida"></div>
+<script>
+function montar(p,r,s){
+  const w=Math.max(...r.map(l=>l.length)), h=r.length;
+  const c=document.createElement('canvas'); c.width=w*s; c.height=h*s;
+  const g=c.getContext('2d');
+  for(let y=0;y<h;y++){const li=r[y];
+    for(let x=0;x<li.length;x++){const cor=p[li[x]]; if(!cor)continue;
+      g.fillStyle=cor; g.fillRect(x*s,y*s,s,s);}}
+  return c;
+}
+function respirar(r,pes){
+  const larg=Math.max(...r.map(l=>l.length));
+  const corte=r.length-pes;
+  return ['.'.repeat(larg), ...r.slice(0,corte-1), ...r.slice(corte)];
+}
+const P_CHARM={'1':'#8a3a10','2':'#d4622a','3':'#f4813c','4':'#ffa25e','5':'#c99a5a','6':'#f2d9a8','7':'#fff0cc',
+  '8':'#e04a10','9':'#ff9c1a','0':'#ffe066','a':'#2a4a8a','b':'#dff0ff'};
+const P_FROAK={'1':'#16304a','2':'#2f5a80','3':'#3d7aa8','4':'#5fa0c8','5':'#e8f4fa','6':'#ffffff','7':'#a8d8ea',
+  '8':'#ffd93d','9':'#c8a020','a':'#14141c','b':'#e87a9a','c':'#ff9ab8','d':'#d03a3a'};
+/* ===== CHARMANDER DE PERFIL v2 =====
+   UM olho so, focinho projetando pra direita, cauda grossa saindo pra
+   esquerda e subindo com a chama no topo. Contorno preto. */
+const P_CHARM2={'1':'#141414','2':'#d4541e','3':'#f5793b','4':'#ff9e5e','5':'#e8b878','6':'#ffe0a8',
+  '7':'#e8401a','8':'#ff8c1a','9':'#ffd93d','a':'#ffffff','b':'#141414'};
+
+const charmanderP=['........................',
+'.............111111.....',
+'...........113333331....',
+'..........1333333333 1..',
+'..........133333333331..',
+'.........13333333333331.',
+'.........133333a3333331.',
+'.........133333ab333331.',
+'.........13333344433331.',
+'.........13333311333331.',
+'..........1333333333331.',
+'.9........11333333333 1.',
+'798........133333333311.',
+'7899.......13333333331..',
+'.7899.....1133666663311.',
+'..7899...113366666663311',
+'...7899.11336666666666 1',
+'....789113366666666666 1',
+'.....78113666666666666 1',
+'......1113666666666666 1',
+'.......113666666666663 1',
+'........1336666666663 1.',
+'........13311....13331..',
+'........1111......111...'];
+
+/* ===== GRENINJA DE PERFIL v2 =====
+   Perfil de ninja: um olho amarelo, cachecol rosa ondulando pra tras,
+   shuriken circular presa nas costas. */
+const P_GREN2={'1':'#101828','2':'#1e3a5f','3':'#2f5f8f','4':'#4a86b8','5':'#9fd0e8','6':'#ffffff',
+  '7':'#c8dff0','8':'#ffd93d','9':'#c8a020','a':'#101018','b':'#e0486f','c':'#ff7a9c','d':'#f5a8c0'};
+
+const greninjaP=['........................',
+'..............111111....',
+'............1133333331..',
+'...........133333333331.',
+'...........13333388a331.',
+'...........1333338aa331.',
+'...........13333388a331.',
+'..........b133333333331.',
+'.........bcb13333333331.',
+'........bccb113333331...',
+'.......bccb...1333331...',
+'..777..bccb...1333331...',
+'.77677.bcb...113333311..',
+'7767677bb...13333333331.',
+'7766677.....1333333333 1',
+'7767677.....1333222333 1',
+'.77677.....13332222233 1',
+'..777......1332222222331',
+'...........1332222222331',
+'...........1332222222331',
+'...........1336666663 1.',
+'...........1336666633 1.',
+'...........13366663 1...',
+'...........116611.11....'];
+
+/* versoes de frente, pra comparar */
+const charmanderF=['........................',
+'.......111111...........',
+'.....1133333311.........',
+'....1333444443331.......',
+'...134444444444431......',
+'...134ab44444ab431......',
+'...134aa44444aa431...8..',
+'...134aa44444aa431..898.',
+'....13444444444431.89098',
+'....13444144144431.89998',
+'.....133341144331...898.',
+'......1333333331.....8..',
+'......13366663311.......',
+'.....13366666633311.....',
+'.....133666666633331....',
+'.....1336666666333331...',
+'.....133666666633331....',
+'.....13366666663331.....',
+'.....1336666666331......',
+'.....133666666331.......',
+'.....13322222331........',
+'.....1331...1331........',
+'....13331..13331........',
+'....1111....1111........'];
+const greninjaF=['........................',
+'.........bb.............',
+'........bccb............',
+'........bccb............',
+'........bccb............',
+'.......bbccb............',
+'......11cccc1...........',
+'.....113333331..........',
+'.....1333333331.........',
+'.....1ddddddddd1........',
+'.....1d3dddddd31........',
+'.....18a3dddd3a81.......',
+'.....1aa333333aa1.......',
+'......13333331..........',
+'.5.....1333331.....5....',
+'.55....1333331....55....',
+'.555..113333311..555....',
+'..55551333333315555.....',
+'...5551333333331555.....',
+'....5.11333333311.5.....',
+'......1332222331........',
+'......1366666631........',
+'......1366666631........',
+'......16611..11661......'];
+
+const FICHA=[
+ ['Charmander',[
+   ['de frente (o que eu tinha)',charmanderF,P_CHARM,3,false],
+   ['DE PERFIL',charmanderP,P_CHARM2,2,true]]],
+ ['Greninja',[
+   ['de frente (o que eu tinha)',greninjaF,P_FROAK,1,false],
+   ['DE PERFIL',greninjaP,P_GREN2,1,true]]]
+];
+const animados=[];
+function celula(rows,pal,pes,esc,naGrama){
+  const a=montar(pal,rows,esc), b=montar(pal,respirar(rows,pes),esc);
+  const cv=document.createElement('canvas');
+  cv.width=a.width+esc*8; cv.height=a.height+esc*8;
+  if(naGrama) cv.className='grama';
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=false;
+  animados.push({g,a,b,cv,fase:Math.random()*2});
+  return cv;
+}
+const out=document.getElementById('saida');
+for(const [titulo,itens] of FICHA){
+  const h=document.createElement('h2'); h.textContent=titulo; out.appendChild(h);
+  const div=document.createElement('div'); div.className='linha';
+  for(const [rot,rows,pal,pes,novo] of itens){
+    for(const [esc,naGrama,leg] of [[8,false,rot],[3,true,'tamanho real']]){
+      const c=document.createElement('div'); c.className='cel'+(novo?' novo':'');
+      c.appendChild(celula(rows,pal,pes,esc,naGrama));
+      const b=document.createElement('b'); b.textContent=leg; c.appendChild(b);
+      div.appendChild(c);
+    }
+  }
+  out.appendChild(div);
+}
+function quadro(){
+  const t=performance.now();
+  for(const o of animados){
+    const g=o.g,cv=o.cv;
+    g.clearRect(0,0,cv.width,cv.height);
+    const f=(Math.floor(t/420+o.fase)%2)===0?o.a:o.b;
+    g.drawImage(f,(cv.width-o.a.width)/2,(cv.height-o.a.height)/2);
+  }
+  requestAnimationFrame(quadro);
+}
+requestAnimationFrame(quadro);
+</script></body></html>
